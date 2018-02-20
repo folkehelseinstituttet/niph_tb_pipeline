@@ -1,0 +1,267 @@
+\documentclass[12pt]{article}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%    Notes
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% This template was modified from the PeerJ article "Evidence-Based Design and Evaluation of a Whole Genome Sequencing Clinical Report for the Reference Microbiology Laboratory" by Gardy et al. It was developed for FHI by Ola Brynildsrud
+
+
+% Version 1.0 : OCT. 2017
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%    Version Change Notes
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%-----------------------
+%  Version 1.0
+%
+% Initial version
+
+%-----------------------
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     3rd party packages
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\usepackage[utf8]{inputenc}
+\usepackage[letterpaper, margin=0.5in,headheight=77pt,top=3.5cm]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+%\usepackage[table]{./packages/tex/latex/xcolor/xcolor}
+\usepackage[table]{xcolor}
+%\usepackage{./packages/tex/latex/tabu/tabu}
+\usepackage{tabu}
+\usepackage{fancyhdr}
+%\usepackage{./packages/tex/latex/lastpage/lastpage}
+\usepackage{lastpage}
+%\usepackage{pageslts}
+\usepackage{graphicx}
+%\usepackage{./packages/tex/latex/collcell/collcell}
+\usepackage{collcell}
+%\usepackage{./packages/tex/latex/multirow/multirow}
+\usepackage{multirow}
+%\usepackage[skins]{./packages/tex/latex/tcolorbox/tcolorbox}
+\usepackage[skins]{tcolorbox}
+%\usepackage{fontspec}
+%    \setmainfont{Lato}
+
+\hypersetup{
+  colorlinks   = true, %Colours links instead of using boxes to indicate links
+  urlcolor     = black, %Colour for external hyperlinks
+  linkcolor    = black %Colour for internal links
+  citecolor   = red %Colour for citations
+}
+\newcolumntype{U}{>{\collectcell\MakeUppercase}l<{\endcollectcell}}
+
+\tcbuselibrary{listings,breakable}
+
+\newtcolorbox{reportSection}[2][]{%
+  colback      = white!5!white,
+  colframe     = white!75!black,
+  fonttitle    = \bfseries,
+  colbacktitle = white,
+  title        = \textbf{\large{#2}},
+  coltitle	   = black,
+  arc = 0mm,
+  opacityframe = 0.5,
+  boxrule=1pt,
+  attach boxed title to top left
+           = {xshift=10pt, yshift=-8pt},
+  boxed title style={%
+    sharp corners, 
+    rounded corners=northwest, 
+    colback=white, 
+    boxrule=0pt,
+    titlerule=0mm},
+  enhanced,
+}
+
+%--------------------------------------------
+% Creating Header Style
+%-------------------------------------------
+
+
+%\renewcommand{\headrule}{\hbox to\headwidth{%
+%    \color{gray}\leaders\hrule height \headrulewidth\hfill}}
+
+%--------------------------------------------
+% Creating Header with Text, Logo and Page Number
+%-------------------------------------------
+
+%-------------- HEADER CONTENT ------------
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\large{\textbf{MYCOBACTERIUM TUBERCULOSIS \\ RAPPORT HELGENOMSSEKVENSERING}} \\ %ISO15189 reporting requirements stipulate that you provide "a clear, unambiguous identification of the examination including, where appropriate, the examination procedure"
+\normalsize{IKKE AKKREDITERT}} %If you are using this as part of an accredited clinical pipeline, you may remove this text
+\chead{}
+\rhead{\includegraphics[scale=0.4]{imageFiles/fhi-logo-for-web-norsk-png}}
+\renewcommand{\headrulewidth}{0pt} % no line in header area
+%To accommodate new oversized header
+%\setlength{\headheight}{4.5\baselineskip} %this is going to produce an error, but works - HOWEVER, it also makes the footer disappear
+
+%-------------- FOOTER CONTENT ------------
+% !!!! WARNING !!!!  OVERLEAF DOESN'T DO A GREAT JOB RUNNING THE \pageref COMMAND THAT WOULD LET US AUTOMATICALLY GET THE LAST PAGE #. SO, THE LAST PAGE IS HARD CODED HERE, THIS WILL CAUSE A PROBLEM IF YOUR REPORT IS LONGER THAN TWO PAGES!!!
+
+\lfoot{Side \thepage\ av 2}
+\input{include/footer.tex}%\rfoot{Isolat ID: 12345678910 | Dato: 2017-01-01 }
+
+\begin{document}
+%---------------------------------------------------------
+%  TABLE WITH RELEVANT PATIENT INFORMATION
+%--------------------------------------------------------
+% Delete this line when including this report in your own pipeline vvvvv
+%\noindent \footnotesize{\textbf{See %\url{https://github.com/amcrisan/TB-WGS-MicroReport} for how to automatically fill the contents of this template}}
+%\vspace{3mm}
+% ^^^^^^^^^^^^^^
+
+
+\tabulinesep=5pt
+\noindent 
+\taburulecolor{lightgray}
+\noindent \begin{tabu} to \textwidth {|XU||XU|}
+\hline
+\input{include/info.tex}
+\end{tabu}
+\vspace{5mm}
+
+%---------------------------------------------------------
+%  SECTION 1 : SUMMARY OF REPORT CONTENT
+%---------------------------------------------------------
+
+\begin{reportSection}{Oppsummering}
+\vspace{1mm}
+
+\input{include/oppsummering.tex}
+
+\end{reportSection}
+\vspace{5mm}
+
+%---------------------------------------------------------
+%  SECTION 2 : SUMMARY OF SPECIATION RESULTS
+%---------------------------------------------------------
+
+\begin{reportSection}{Typing} % Our design study indicated this was the preferred headline word for this section, in which speciation is summarised.
+\vspace{1mm}
+\input{include/typing.tex}
+\end{reportSection}
+\vspace{5mm}
+
+%---------------------------------------------------------
+%  SECTION 3 : SUMMARY OF DRUG SUSCEPTIBILITY RESULTS
+%---------------------------------------------------------
+
+
+\begin{reportSection}{Sensitivitet for antibiotika}
+\vspace{1mm}
+\tabulinesep=2pt
+\noindent 
+\taburulecolor{lightgray}
+\noindent \begin{tabu} to \textwidth {X[1.1,l]X}
+\multirow{5}{*}{\parbox{7.5cm}{\footnotesize{Resistens rapporteres n\aa r en kjent resistensmutasjon kan fastsl\aa es med h\o y konfidens. \textbf{``Ingen mutasjon detektert'' er ikke ensbetydende med sensitivitet ovenfor antibiotika}.}}}
+\input{include/resistensbokser.tex}
+\end{tabu}
+\vspace{3mm} %% Add a Bit of space between the entities
+
+%--------- Summary of drug susceptibility - table
+\tabulinesep=5pt
+\noindent 
+\taburulecolor{lightgray}
+\noindent \begin{tabu} to \textwidth {X[0.5,l]X[0.75,l]X[0.75,l]X[2,l]}
+\hline
+\input{include/resistens.tex}
+\end{tabu}
+\end{reportSection}
+
+%---------------------------------------------------------
+%  SECTION 4 : CLUSTER DETECTION RESULTS
+%---------------------------------------------------------
+\pagebreak
+\begin{reportSection}{Deteksjon av smitteclustre}
+\vspace{3mm}
+\input{include/beslektede_oppsummering}
+\vspace{2mm}
+
+\tabulinesep=5pt
+\noindent 
+\taburulecolor{lightgray}
+\noindent \begin{tabu} to \textwidth {XX}
+% Set your own thresholds and choice of language here. You might also wish to populate this section with a pre-written narrative about the cluster your isolate belongs to, if available
+\input{include/beslektede.tex}
+
+\end{tabu}
+
+\includegraphics[scale=0.65]{./imageFiles/tree}%{./imageFiles/Test}%
+
+\end{reportSection}
+\vspace{1mm}
+
+%---------------------------------------------------------
+%  SECTION 5 : ASSAY DETAILS 
+%---------------------------------------------------------
+\begin{reportSection}{Detaljer}
+\vspace{1mm}
+\tabulinesep=5pt
+\noindent 
+\taburulecolor{lightgray}
+\noindent \begin{tabu} to \textwidth {|XU||XU|}
+\hline
+\input{include/pipelinedetaljer}
+
+\end{tabu}
+\vspace{1mm}
+
+\end{reportSection}
+\vspace{1mm}
+
+%---------------------------------------------------------
+%  SECTION 6 : ADDITIONAL COMMENTS
+%---------------------------------------------------------
+%Comments are for anything funny that was found by the 
+\begin{reportSection}{Kommentarer}
+% This is where any additional comments might go
+\vspace{20mm}
+
+%\footnotesize{No additional comments for this report}
+%\vspace{2mm}
+
+%\textcolor{gray}{\footnotesize{\textit{\textbf{Standard Disclaimer:} Low frequency hetero-resistance below the limit of detection by sequencing may affect typing results.  The interpretation provided is based on the current understanding of genotype-phenotype relationships.}}}
+
+\end{reportSection}
+\vspace{1mm}
+
+
+%---------------------------------------------------------
+%  SECTION 7 : DISCLAIMER
+%---------------------------------------------------------
+% Note: Disclaimer is a general note that will appear on all reports. In contrast to Comments, which is for the the result of the individual patient. 
+%\begin{reportSection}{Disclaimer}
+% This is where any additional comments might go
+%\vspace{1mm}
+
+%\footnotesize{Low frequency hetero-resistance below the limit of detection by sequencing may affect typing results.  The interpretation provided is based on the current understanding of genotype-phenotype relationships.}
+%\end{reportSection}
+%\vspace{1mm}
+
+%---------------------------------------------------------
+%  SECTION 8 : AUTHORIZATION
+%---------------------------------------------------------
+\begin{reportSection}{Godkjent av}
+% This section is required by ISO15189 standards
+\vspace{1mm}
+\tabulinesep=5pt
+\noindent 
+\taburulecolor{lightgray}
+\noindent \begin{tabu} to \textwidth {|XU||XU|}
+\hline
+%--------------- v ADD YOUR TABLE CONTENTS BELOW v ---------------------
+Signatur  &   & Navn  &   \\ \hline
+Stilling   &   & Dato    &        \\ \hline
+%--------------- ^ ADD YOUR TABLE CONTENTS ABOVE ^ ---------------------
+\end{tabu}
+
+\end{reportSection}
+
+
+
+\end{document}
