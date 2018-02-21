@@ -204,7 +204,7 @@ def CollType():
     if os.path.isfile("colltype.txt"):
         print("Coll type already calculated")
         return 0
-    errorcode = call("colltyper snippy/snps.vcf > colltype.txt", shell=True)
+    errorcode = call("colltyper -o colltype.txt snippy/snps.vcf", shell=True)
 
 def sampleAnalysis(sample):
     
