@@ -282,7 +282,7 @@ def CreateBeslektede(relationtoothers):
     text = '''
 Terskelverdi  & Antall tidligere sekvenserte isolater  \\\ \hline 
 N\\ae rt beslektet (0 til 5 mutasjoner forskjell) & \\textbf{%s} isolater \\\ 
-Beslektet (6 til 30 mutasjoner forskjell) & \\textbf{%s} isolater \\\ \hline 
+Beslektet (0 til 30 mutasjoner forskjell) & \\textbf{%s} isolater \\\ \hline 
 ''' % (str(relationtoothers["close"]), str(relationtoothers["somewhat"]))
 
     with open("Latex_template/include/beslektede.tex","w") as outfile:
