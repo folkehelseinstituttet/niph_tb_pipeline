@@ -5,6 +5,7 @@
 import sys
 import os
 import time
+from __init__ import __version__ as VERSION
 
 def CreateFooter(metainfo):
     currentdate = time.strftime("%Y-%b-%d")
@@ -287,11 +288,14 @@ Beslektet (6 til 30 mutasjoner forskjell) & \\textbf{%s} isolater \\\ \hline
     with open("Latex_template/include/beslektede.tex","w") as outfile:
         outfile.write(text)
 
-def CreatePipelineInfo():
+def CreatePipelineInfo(metainfo):
     # Get metainfo from master file or configure them here
-    Sekvensator = 'Illumina Miseq'
+    if "Sekvensator" in metainfo:
+        Sekvensator = metainfo["Sekvensator"]
+    else:
+        Sekvensator = 'Illumina'
     Metode = 'Helgenom'
-    Pipeline = 'OlaTB v.1.0'
+    Pipeline = 'NIPH TB pipeline v.%s' % (VERSION)
     Referansegenom = 'H37Rv'
 
     text = '''
@@ -315,4 +319,4 @@ def CreateReport(metainfo, resdic, clusterjanei, lineage, relationtoothers, covd
     CreateResistens(resdic)
     CreateBeslektedeOppsummering(clusterjanei)
     CreateBeslektede(relationtoothers)
-    CreatePipelineInfo()
+    CreatePipelineInfo(metainfo)
