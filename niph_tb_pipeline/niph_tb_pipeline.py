@@ -19,6 +19,9 @@ To avoid harmful shell injection, do assert no spaces in any files. NO files are
 CURRENT PROBLEMS:
 - Xres box not checked?
 - Still need to mask PE/PPE regions
+- Save time by not zipping fastqc output? Use --extract flag when running fastq. Can then remove unzip commands [X]
+- Colltyper not latest version in image
+- Fixed json_to_tsv [X]
 
 '''
 import os
@@ -63,13 +66,16 @@ def FindReads():
     if len(R1) > 1 or len(R2) > 1:
         sys.exit("Ambiguity error: More than one file matches 'R1_001.fastq' or 'R2_001.fastq'")
     if len(R1) < 1 or len(R2) < 1:
+        R1 = [s for s in files if "R1.fastq" in s]
+        R2 = [s for s in files if "R2.fastq" in s]
+    if len(R1) < 1 or len(R2) < 1:
         sys.exit("Could not locate reads. Verify correct naming ('R1_001.fastq.gz')")
     
     print("Found R1: %s, \t R2: %s" % (R1, R2))
     return {"R1": R1[0], "R2": R2[0]}
 
-def ReadSummary():
-    with open("summary.txt","rU") as f:
+def ReadSummary(summary):
+    with open(summary,"rU") as f:
         myf = f.read()
         if myf[:4] == "PASS":
             return 0
@@ -108,14 +114,14 @@ def RunFastQC(R1, R2):
     
     # Run FastQC
     print("Running cmd: fastqc %s %s in dir %s" % (R1, R2, os.getcwd()))
-    errorcode = call("fastqc %s %s" % (R1, R2), shell=True)
+    errorcode = call("fastqc --extract %s %s" % (R1, R2), shell=True)
     if errorcode != 0:
         sys.exit("FastQC did not complete correctly.")
 
-    call("unzip -o -j %s %s -d '.'" % (R1zip, R1sum), shell=True)
-    R1info = ReadSummary()
-    call("unzip -o -j %s %s -d '.'" % (R2zip, R2sum), shell=True)
-    R2info = ReadSummary()
+    #call("unzip -o -j %s %s -d '.'" % (R1zip, R1sum), shell=True)
+    R1info = ReadSummary(R1sum)
+    #call("unzip -o -j %s %s -d '.'" % (R2zip, R2sum), shell=True)
+    R2info = ReadSummary(R2sum)
     if R1info != 0 or R2info != 0:
         # The presence of a Fastqc_problems file indicates a problem with the sequence data
         open("Fastqc_problems","w")
@@ -195,7 +201,7 @@ def RunMykrobe(R1, R2, sampleName):
         return 0
     errorcode1 = call("mykrobe predict %s tb --mccortex31_path %s -1 %s %s > mykrobe_output.json" % (sampleName, MCCORTEX31_PATH, R1, R2), shell=True)
     #errorcode1 = call("mykrobe predict %s tb -1 %s %s > mykrobe_output.json" % (sampleName, R1, R2), shell=True)
-    errorcode2 = call("/scripts/json_to_tsv.py mykrobe_output.json > mykrobe_output.tsv", shell=True)
+    errorcode2 = call("json_to_tsv mykrobe_output.json > mykrobe_output.tsv", shell=True)
     errorcode3 = call("rm -rf atlas", shell=True)
     errorcode4 = call("rm mykrobe_output.json",shell=True)
 
@@ -264,6 +270,11 @@ def CopySnippyDataToShallowDir(sample):
     errorcode1 = call("mv %s/snippy/snps.tab %s/snps.tab" % (sample, sample), shell=True)
     errorcode2 = call("mv %s/snippy/snps.aligned.fa %s/snps.aligned.fa" % (sample, sample), shell=True)
 
+def MaskRepetitiveRegions(alnfile):
+    '''This method is not yet complete'''
+    outfilename = alnfile[:-8] + 'masked.fasta'
+    errorcode = call("bedtools maskfasta -fi %s -fo %s -bed ")
+
 
 def RunSnippyCore(basedir, timestamp):
     # Change so that this analysis is not run in GLOBAL dir but local
@@ -273,9 +284,14 @@ def RunSnippyCore(basedir, timestamp):
     #    sys.exit("Unable to move to global collection dir: %s" % GLOBAL_COLLECTION)
     if not os.path.isfile("snippy-core.log"):
         errorcode1 = call("snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa %s/* 2> snippy-core.log" % (timestamp, GLOBAL_COLLECTION), shell=True)
+    
     # Discard whole-genome alignment
-    if os.path.isfile("rm TB_all_%s.full.aln" % timestamp):
-        errorcode2 = call("rm TB_all_%s.full.aln" % timestamp, shell=True)
+    #if os.path.isfile("TB_all_%s.full.aln" % timestamp):
+    #    errorcode2 = call("rm TB_all_%s.full.aln" % timestamp, shell=True)
+    
+    # Mask bad regions in full alignment
+    #maskRepetitiveRegions("TB_all_%s.full.aln" % timpestamp)
+
     # Create continuously evolving global tree
     if not os.path.isfile("Global_collection_tree.nwk"):
         errorcode3 = call("FastTree -nt -gtr TB_all_%s.aln > Global_collection_tree.nwk" % (timestamp), shell=True)
