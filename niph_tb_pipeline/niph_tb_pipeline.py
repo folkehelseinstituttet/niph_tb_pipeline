@@ -17,13 +17,7 @@
 To avoid harmful shell injection, do assert no spaces in any files. NO files are allowed to contain space
 
 CURRENT PROBLEMS:
-- Xres box not checked?
-- Still need to mask PE/PPE regions
-- Save time by not zipping fastqc output? Use --extract flag when running fastq. Can then remove unzip commands [X]
-- Colltyper not latest version in image
-- Make sure permissions are set so that we have write access on Felles. As of 23 Feb, even olbb in Mint does not have write permission.
-- Fixed json_to_tsv [X]
-
+NONE?
 '''
 import os
 import sys
@@ -205,10 +199,10 @@ def RunMykrobe(R1, R2, sampleName):
         print("Mykrobe predictor results already exists in %s" % os.getcwd())
         return 0
     errorcode1 = call("mykrobe predict %s tb --mccortex31_path %s -1 %s %s > mykrobe_output.json" % (sampleName, MCCORTEX31_PATH, R1, R2), shell=True)
-    #errorcode1 = call("mykrobe predict %s tb -1 %s %s > mykrobe_output.json" % (sampleName, R1, R2), shell=True)
     errorcode2 = call("json_to_tsv mykrobe_output.json > mykrobe_output.tsv", shell=True)
     errorcode3 = call("rm -rf atlas", shell=True)
-    errorcode4 = call("rm mykrobe_output.json",shell=True)
+    if os.path.isfile("mykrobe_output.tsv"):
+        errorcode4 = call("rm mykrobe_output.json",shell=True)
 
 def CollType():
     print("Typing according to Coll (2014) scheme")

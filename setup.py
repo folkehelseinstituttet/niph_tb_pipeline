@@ -29,7 +29,7 @@ setup(name='niph_tb_pipeline',
         'colltyper'],
     entry_points={
         'console_scripts': ['niph_tb_pipeline=niph_tb_pipeline.niph_tb_pipeline:main',
-                            'json_to_tsv=niph_tb_pipeline.json_to_tsv',
+                            'json_to_tsv=niph_tb_pipeline.json_to_tsv:main',
                             'tex_finalizer=niph_tb_pipeline.Tex_finalizer']
     },
     package_data={'niph_tb_pipeline': ['LICENSE', 'setup.py','README.md','docs/*','data/*']},
