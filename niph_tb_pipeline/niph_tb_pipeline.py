@@ -186,6 +186,9 @@ def FindCoverage():
 
 def CleanupSnippyData():
     print("Cleaning up snippy data")
+    if not os.path.isdir("snippy/reference/ref/"):
+        print("Snippy data already cleaned up")
+        return 0
     errorcode1 = call("rm -rf snippy/reference/ref/", shell=True)
     errorcode2 = call("rm -rf snippy/reference/genomes/", shell=True)
     errorcode3 = call("rm snippy/reference/ref.fa.*", shell=True)
@@ -278,7 +281,7 @@ def MaskRepetitiveRegions(alnfile):
     excludefile = TB_EXCLUDECOLS
     with open(excludefile, 'rU') as exfile:
         exclude = exfile.read()
-    errorcode = call("trimal -in %s -selectcols %s -out %s" % (alnfile, exclude, outfilename), shell=True)
+    errorcode = call("trimal -in %s -out %s -selectcols %s " % (alnfile, outfilename, exclude), shell=True)
     return outfilename
 
 def replaceOldSNPalignment(maskedfile, filetoreplace):
@@ -463,7 +466,7 @@ def FinalizeSampleReport(sample, metainfo, resdic, clusterjanei, lineage, relati
         os.chdir("Latex_template")
     except:
         sys.exit("Unable to move in tex directory of %s" % sample)
-    call("pdflatex tb-wgs-report.tex", shell=True)
+    call("pdflatex tb-wgs-report.tex > /dev/null 2>$1", shell=True)
     call("cp tb-wgs-report.pdf ../%s-tb-wgs-report.pdf" % sample, shell=True)
     call("cp tb-wgs-report.pdf %s/%s/%s-tb-wgs-report.pdf" % (GLOBAL_COLLECTION, sample, sample), shell=True)
     try:
