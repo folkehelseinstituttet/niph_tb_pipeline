@@ -21,6 +21,7 @@ CURRENT PROBLEMS:
 - Still need to mask PE/PPE regions
 - Save time by not zipping fastqc output? Use --extract flag when running fastq. Can then remove unzip commands [X]
 - Colltyper not latest version in image
+- Make sure permissions are set so that we have write access on Felles. As of 23 Feb, even olbb in Mint does not have write permission.
 - Fixed json_to_tsv [X]
 
 '''
@@ -40,6 +41,7 @@ KAIJU_DB_DMI = "/mnt/kaijudb/kaiju_db_nr.fmi"
 KAIJU_NAMES_DMP = "/mnt/kaijudb/names.dmp"
 KAIJU_BIN = "/opt/kaiju/bin"
 TB_REF = "/mnt/Reference/M_tuberculosis_H37Rv.gb"
+TB_EXCLUDECOLS = "/mnt/Reference/Trimal_excludecolumns.txt"
 MCCORTEX31_PATH = "/opt/Mykrobe-predictor/mccortex/bin/mccortex31"
 FIGTREE_EXEC = "java -jar /mnt/FigTree_v1.4.3/lib/figtree.jar"
 GLOBAL_COLLECTION = "/mnt/global_collection"
@@ -273,7 +275,14 @@ def CopySnippyDataToShallowDir(sample):
 def MaskRepetitiveRegions(alnfile):
     '''This method is not yet complete'''
     outfilename = alnfile[:-8] + 'masked.fasta'
-    errorcode = call("bedtools maskfasta -fi %s -fo %s -bed ")
+    excludefile = TB_EXCLUDECOLS
+    with open(excludefile, 'rU') as exfile:
+        exclude = exfile.read()
+    errorcode = call("trimal -in %s -selectcols %s -out %s" % (alnfile, exclude, outfilename), shell=True)
+    return outfilename
+
+def replaceOldSNPalignment(maskedfile, filetoreplace):
+    call("snp-sites -o %s %s" % (filetoreplace, maskedfile), shell=True)
 
 
 def RunSnippyCore(basedir, timestamp):
@@ -285,16 +294,21 @@ def RunSnippyCore(basedir, timestamp):
     if not os.path.isfile("snippy-core.log"):
         errorcode1 = call("snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa %s/* 2> snippy-core.log" % (timestamp, GLOBAL_COLLECTION), shell=True)
     
-    # Discard whole-genome alignment
-    #if os.path.isfile("TB_all_%s.full.aln" % timestamp):
-    #    errorcode2 = call("rm TB_all_%s.full.aln" % timestamp, shell=True)
-    
     # Mask bad regions in full alignment
-    #maskRepetitiveRegions("TB_all_%s.full.aln" % timpestamp)
+    maskedfile = maskRepetitiveRegions("TB_all_%s.full.aln" % timestamp)
+    replaceOldSNPalignment(maskedfile, "TB_all_%s.aln" % timestamp)
+
+    # Discard whole-genome alignment
+    if os.path.isfile("TB_all_%s.full.aln" % timestamp):
+        errorcode2 = call("rm TB_all_%s.full.aln" % timestamp, shell=True)
 
     # Create continuously evolving global tree
     if not os.path.isfile("Global_collection_tree.nwk"):
         errorcode3 = call("FastTree -nt -gtr TB_all_%s.aln > Global_collection_tree.nwk" % (timestamp), shell=True)
+    
+    # Remove masked file
+    if os.path.isfile("TB_all_%s.masked.fasta" % timestamp):
+        errorcode4 = call("rm TB_all_%s.masked.fasta", shell=True)
     #errorcode4 = call("mv TB_all* %s" % basedir, shell=True)
     #errorcode5 = call("mv snippy-core.log %s" % basedir, shell=True)
     #try:

@@ -42,7 +42,7 @@ def CreateInfo(metainfo, covdicsample):
     infostring = '''
     ID for pr\\o ve    &  {SampleName}    & Barcode          & {Barcode}           \\\ \hline
     Sted   & {Location}         & Isolert fra       & {LocatedFrom}          \\\ \hline
-    Datakvalitet & {DataQual}       & Isolasjonsdato & {Isolationdate}      \\\ \hline
+    Datakvalitet & {DataQual}       & Pr\\o vetakningsdato & {Isolationdate}      \\\ \hline
     Read depth  & {Readdepth}       & Dato  & {currentdate}  \\\ \hline
     '''
 
