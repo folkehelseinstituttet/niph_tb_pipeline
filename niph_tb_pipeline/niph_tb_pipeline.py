@@ -460,7 +460,7 @@ def FinalizeSampleReport(sample, metainfo, resdic, clusterjanei, lineage, relati
         os.chdir("Latex_template")
     except:
         sys.exit("Unable to move in tex directory of %s" % sample)
-    call("pdflatex tb-wgs-report.tex > /dev/null 2>$1", shell=True)
+    call("pdflatex tb-wgs-report.tex > /dev/null 2>&1", shell=True)
     call("cp tb-wgs-report.pdf ../%s-tb-wgs-report.pdf" % sample, shell=True)
     call("cp tb-wgs-report.pdf %s/%s/%s-tb-wgs-report.pdf" % (GLOBAL_COLLECTION, sample, sample), shell=True)
     try:
