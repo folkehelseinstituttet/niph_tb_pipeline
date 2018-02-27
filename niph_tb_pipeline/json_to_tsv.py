@@ -4,19 +4,23 @@ from __future__ import print_function
 # This script is intended to load a JSON dict containing resistotypes,
 # a list of comids and a list of drugs of interest. It will return a column for each drug,
 # Where 1 = R, 0 S, 0 unknown.
+# CHANGED: put json_to_tsv_argparser and main in defined functions (allow imports)
 import argparse
 import json
 import csv
 import os
 
-parser = argparse.ArgumentParser(description='''load a JSON dict containing resistotypes,
- a list of comids and a list of drugs of interest. It will return a column for each drug,
- Where 1 = R, 0 S, 0 unknown. ''')
-parser.add_argument('--format', type=str,
+
+def json_to_tsv_argparser():
+    parser = argparse.ArgumentParser(description='''load a JSON dict containing resistotypes,
+    a list of comids and a list of drugs of interest. It will return a column for each drug,
+    Where 1 = R, 0 S, 0 unknown. ''')
+    parser.add_argument('--format', type=str,
                     help='--format', default="long")
-parser.add_argument('files', type=str, nargs='+',
+    parser.add_argument('files', type=str, nargs='+',
                     help='files')
-args = parser.parse_args()
+    args = parser.parse_args()
+    return args
 
 
 def load_json(f):
@@ -121,80 +125,85 @@ def get_variant_calls(d):
                            ]))
     return ";".join(variants)
 
+def main():
+    args = json_to_tsv_argparser()
 
-if args.format == "long":
-    header = [
-        "mykrobe_version",
-        "file",
-        "plate_name",
-        "sample",
-        "drug",
-        "phylo_group",
-        "species",
-        "lineage",
-        "phylo_group_per_covg",
-        "species_per_covg",
-        "lineage_per_covg", 
-        "phylo_group_depth",
-        "species_depth",
-        "lineage_depth",                  
-        "susceptibility",
-        "variants (gene:alt_depth:wt_depth:conf)",
-        "genes (prot_mut-ref_mut:percent_covg:depth)"]
-    print ("\t".join(header))
-    rows = []
-    for i, f in enumerate(args.files):
-        file = get_file_name(f)
-        try:
-            d = load_json(f)
-            k = list(d.keys())
-            d = d[k[0]]
-        except ValueError:
-            d = {}
-        
+    if args.format == "long":
+        header = [
+            "mykrobe_version",
+            "file",
+            "plate_name",
+            "sample",
+            "drug",
+            "phylo_group",
+            "species",
+            "lineage",
+            "phylo_group_per_covg",
+            "species_per_covg",
+            "lineage_per_covg", 
+            "phylo_group_depth",
+            "species_depth",
+            "lineage_depth",                  
+            "susceptibility",
+            "variants (gene:alt_depth:wt_depth:conf)",
+            "genes (prot_mut-ref_mut:percent_covg:depth)"]
+        print ("\t".join(header))
+        rows = []
+        for i, f in enumerate(args.files):
+            file = get_file_name(f)
+            try:
+                d = load_json(f)
+                k = list(d.keys())
+                d = d[k[0]]
+            except ValueError:
+                d = {}
+            
 
-        phylo_group,phylo_group_per_covg,phylo_group_depth  = get_phylo_group_string(d)
-        species,species_per_covg,species_depth  = get_species_string(d)
-        lineage,lineage_per_covg,lineage_depth  = get_lineage_string(d)
-        sample_name = get_sample_name(d)
-        try:
-            plate_name = get_plate_name(f)
-        except  IndexError:
-            plate_name = ""
+            phylo_group,phylo_group_per_covg,phylo_group_depth  = get_phylo_group_string(d)
+            species,species_per_covg,species_depth  = get_species_string(d)
+            lineage,lineage_per_covg,lineage_depth  = get_lineage_string(d)
+            sample_name = get_sample_name(d)
+            try:
+                plate_name = get_plate_name(f)
+            except  IndexError:
+                plate_name = ""
 
-        drug_list = sorted(d.get('susceptibility', {}).keys())
-        drugs = sorted(drug_list)
+            drug_list = sorted(d.get('susceptibility', {}).keys())
+            drugs = sorted(drug_list)
 
-        if not drugs:
-            drugs = ["NA"]
+            if not drugs:
+                drugs = ["NA"]
 
 
-        for drug in drugs:
-            call = d.get('susceptibility', {}).get(drug, {})
-            called_by_variants = get_variant_calls(call.get("called_by",{}))
-            called_by_genes = get_called_genes(call.get("called_by",{}))
-            row = [d.get("version",{}).get("mykrobe-predictor","-1"),
-                file,
-                plate_name,
-                sample_name,
-                drug,
-                phylo_group,
-                species,
-                lineage,
-                phylo_group_per_covg,
-                species_per_covg,
-                lineage_per_covg,                  
-                phylo_group_depth,
-                species_depth,
-                lineage_depth,                
-                call.get(
-                    "predict",
-                    'N'),
-                called_by_variants, 
-                called_by_genes
-                ]
-            # rows.append(row)
-            print ("\t".join(row))
+            for drug in drugs:
+                call = d.get('susceptibility', {}).get(drug, {})
+                called_by_variants = get_variant_calls(call.get("called_by",{}))
+                called_by_genes = get_called_genes(call.get("called_by",{}))
+                row = [d.get("version",{}).get("mykrobe-predictor","-1"),
+                    file,
+                    plate_name,
+                    sample_name,
+                    drug,
+                    phylo_group,
+                    species,
+                    lineage,
+                    phylo_group_per_covg,
+                    species_per_covg,
+                    lineage_per_covg,                  
+                    phylo_group_depth,
+                    species_depth,
+                    lineage_depth,                
+                    call.get(
+                        "predict",
+                        'N'),
+                    called_by_variants, 
+                    called_by_genes
+                    ]
+                # rows.append(row)
+                print ("\t".join(row))
 
-else:
-    0 / 0
+    else:
+        0 / 0
+
+if __name__ == '__main__':
+    main()
