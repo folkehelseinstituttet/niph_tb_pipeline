@@ -270,8 +270,10 @@ def CopyToGlobalDir(sample):
     # call("ln -s %s %s/%s/" % (SNIPPY_REF_DIR, GLOBAL_COLLECTION, sample), shell=True) # NOT NEEDED FOR DOCKER VERSION
 
 def CopySnippyDataToShallowDir(sample):
-    errorcode1 = call("mv %s/snippy/snps.tab %s/snps.tab" % (sample, sample), shell=True)
-    errorcode2 = call("mv %s/snippy/snps.aligned.fa %s/snps.aligned.fa" % (sample, sample), shell=True)
+    if os.path.isfile("%s/snippy/snps.tab" % sample):
+        errorcode1 = call("mv %s/snippy/snps.tab %s/snps.tab" % (sample, sample), shell=True)
+    if os.path.isfile("%s/snippy/snps.aligned.fa" % sample):
+        errorcode2 = call("mv %s/snippy/snps.aligned.fa %s/snps.aligned.fa" % (sample, sample), shell=True)
 
 def MaskRepetitiveRegions(alnfile):
     '''This method is not yet complete'''
