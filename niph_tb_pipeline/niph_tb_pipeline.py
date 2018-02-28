@@ -257,6 +257,10 @@ def CopyToGlobalDir(sample):
             continue
         if fil.endswith("tmp"):
             continue
+        if fil.endswith("fastqc"):
+            continue
+        if fil.endswith("template"):
+            continue
         if not os.path.isfile("%s/%s/%s" % (GLOBAL_COLLECTION, sample, fil)):
             call("cp -rf %s/%s %s/%s/%s" % (sample, fil, GLOBAL_COLLECTION, sample, fil), shell=True)
     if not os.path.isfile("%s/%s/snps.tab" % (GLOBAL_COLLECTION, sample)):
