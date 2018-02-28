@@ -9,7 +9,7 @@ from __init__ import __version__ as VERSION
 
 def CreateFooter(metainfo):
     currentdate = time.strftime("%Y-%b-%d")
-    ID = metainfo["ID"]
+    ID = metainfo["ID"].replace("_","\\_")
     footer = '\\rfoot{Isolat ID: %s | Dato: %s }' % (ID, currentdate)
     with open("Latex_template/include/footer.tex","w") as outfile:
         outfile.write(footer)
@@ -27,7 +27,7 @@ def CreateInfo(metainfo, covdicsample):
     else:
         DataQual = "OK"
 
-    ID = metainfo["ID"]
+    ID = metainfo["ID"].replace("_","\\_")
     Barcode = metainfo["Barcode"]
     Location = metainfo["Location"]
     LocatedFrom = metainfo["Source"]
