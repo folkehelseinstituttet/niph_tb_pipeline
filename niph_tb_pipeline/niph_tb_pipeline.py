@@ -296,8 +296,12 @@ def RunSnippyCore(basedir, timestamp):
         errorcode1 = call("snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa %s/* 2> snippy-core.log" % (timestamp, GLOBAL_COLLECTION), shell=True)
     
     # Mask bad regions in full alignment
-    maskedfile = MaskRepetitiveRegions("TB_all_%s.full.aln" % timestamp)
-    replaceOldSNPalignment(maskedfile, "TB_all_%s.aln" % timestamp)
+    if os.path.isfile("TB_all_%s.full.aln" % timestamp):
+        if not os.path.isfile("TB_all_%s.masked.fasta" % timestamp):
+            maskedfile = MaskRepetitiveRegions("TB_all_%s.full.aln" % timestamp)
+    
+    # Replace basic SNP alignment with masked SNP alignment
+    replaceOldSNPalignment("TB_all_%s.masked.fasta" % timestamp, "TB_all_%s.aln" % timestamp)
 
     # Discard whole-genome alignment
     if os.path.isfile("TB_all_%s.full.aln" % timestamp):
