@@ -325,7 +325,7 @@ def RunSnippyCore(basedir, timestamp):
 
 def RunSnpDists():
     print("Finding distances between all isolates in global collection")
-    errorcode = call("snp-dists -c TB_all*.aln > TB_all_dists.csv", shell=True)
+    errorcode = call("snp-dists -a -c TB_all*.aln > TB_all_dists.csv", shell=True)
 
 def ReadSnpDistsObject(dists):
     header = next(dists)[1:]
