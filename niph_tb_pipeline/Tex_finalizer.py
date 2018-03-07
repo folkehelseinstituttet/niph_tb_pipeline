@@ -86,6 +86,7 @@ def CreateTyping(lineage):
     # Now gathered directly from colltyper
     #lineage = lineage.replace("_","-")
     #if lineage is None:
+    lineage = lineage.replace("_","\\_")
     if lineage == "":
         typing = 'Pr\\o ven ble ikke entydig typet til en bestemt lineage. '
     else:
