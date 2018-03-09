@@ -48,6 +48,13 @@ def FindSampleName(sample):
         assert ' ' not in sampleName
     except AssertionError:
         sys.exit("Could not proceed because some file names contain space. Check sample %s " % sampleName)
+
+    # Further checks to make sure there is no injection in filenames
+    try:
+        assert re.match("^[\w_\-]+/?$", sampleName)
+    except AssertionError:
+        sys.exit("Isolate names can only contain letters (a-z, A-Z), numbers (0-9), dash (-) and underscore (_)")
+
     if sample.endswith("/"):
         sampleName = sampleName[:-1]
     if "_" in sample:
@@ -67,6 +74,19 @@ def FindReads():
     if len(R1) < 1 or len(R2) < 1:
         sys.exit("Could not locate reads. Verify correct naming ('R1_001.fastq.gz')")
     
+    try:
+        assert ' ' not in R1[0]
+        assert ' ' not in R2[0]
+    except AssertionError:
+        sys.exit("Could not proceed because some file names contain space. Check sample %s and %s" % (R1[0], R2[0]))
+
+    # Further checks to make sure there is no injection in filenames
+    try:
+        assert re.match("^[\w_\-]+(R1_001\.fastq|R1\.fastq)$", R1[0])
+        assert re.match("^[\w_\-]+(R1_001\.fastq|R1\.fastq)$", R2[0])
+    except AssertionError:
+        sys.exit("Isolate names can only contain letters (a-z, A-Z), numbers (0-9), dash (-) and underscore (_)")
+
     print("Found R1: %s, \t R2: %s" % (R1, R2))
     return {"R1": R1[0], "R2": R2[0]}
 
@@ -134,12 +154,19 @@ def AnalyzeKaijuReport(myfile):
         mostcontent = splitKaijuReportLine(content[2])
         runnerup = splitKaijuReportLine(content[3])
         # Completely arbitrary cutoff that highest hit has to have 10 times as many as runnerup
-        if mostcontent["Species"] != "Mycobacterium tuberculosis":
+        if "Mycobacterium" not in mostcontent["Species"]:
             of = open("Kaijuclassificationproblem","w")
             of.write(mostcontent["Species"] + "\n")
             of.close()
-        if mostcontent["Reads"] < 10 * runnerup["Reads"]:
-            open("Kaijucontaminationproblem","w")
+        else:
+            if mostcontent["Species"] != "Mycobacterium tuberculosis":
+                of = open("Kaijuothermycobacterium","w")
+                of.write(mostcontent["Species"] + "\n")
+                of.close()
+            elif mostcontent["Reads"] < 10 * runnerup["Reads"]:
+                if not "Mycobacterium" in runnerup["Species"]:
+                    open("Kaijucontaminationproblem","w")
+            # Else - Do not write any files. Top species is MTB with at least 10X the n reads of runnerup
 
 def RunKaiju(R1, R2):
     # Run Kaiju

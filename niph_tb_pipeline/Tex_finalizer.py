@@ -20,6 +20,8 @@ def CreateInfo(metainfo, covdicsample):
         DataQual = "Lav output"
     elif os.path.isfile("Kaijuclassificationproblem"):
         DataQual = "Ikke MTB"
+    elif os.path.isfile("Kaijuothermycobacterium"):
+        DataQual = "Annen mykobakterie"
     elif os.path.isfile("Kaijucontaminationproblem"):
         DataQual = "Mulig kontaminasjon"
     elif covdicsample < 90.00:
