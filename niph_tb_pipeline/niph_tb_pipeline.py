@@ -532,20 +532,20 @@ def main():
     RunSnippyCore(basedir, timestamp)
     RunSnpDists()
     # For each sample, find the 20 closest and draw a FastTree
-    with open("TB_all_dists.csv","rbU") as distfile:
+    with open("TB_all_dists.csv","rU") as distfile:
         print("Reading distances between all isolates in global collection")
         dists = csv.reader(distfile, delimiter=",")
         usedists = ReadSnpDistsObject(dists)
 
     # Load Biopython alignment of all snps
-    with open("TB_all_%s.aln" % timestamp, "rbU") as snpfile:
+    with open("TB_all_%s.aln" % timestamp, "rU") as snpfile:
         print("Loading global alignment of SNPs")
         all_snps = Bio.AlignIO.read(snpfile, "fasta")
 
     
     # Load sample metadata
     if metadataexists:
-        with open("Metadata.csv","rbU") as metainfofile:
+        with open("Metadata.csv","rU") as metainfofile:
             print("Loading metadata")
             metainfo = csv.reader(metainfofile,delimiter=",")
             metainfodic = {}
@@ -558,7 +558,7 @@ def main():
         for sample in dirs:
             metainfodic[sample] = {"ID": sample, "Barcode":"","Location":"","Source":"","Isolated":""}
 
-    with open("snippy-core.log","rbU") as snippycorelogfile:
+    with open("snippy-core.log","rU") as snippycorelogfile:
         print("Reading snippy-core log")
         snippyloglines = snippycorelogfile.readlines()
         covdic = {}
