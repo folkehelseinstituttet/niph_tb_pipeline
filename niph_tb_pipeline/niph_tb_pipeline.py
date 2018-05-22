@@ -417,7 +417,7 @@ def HandleMutation(mutation):
 def PimpResDic(mykrobetsvfile):
     with open(mykrobetsvfile, "rU") as infile:
         data = csv.reader(infile, delimiter="\t")
-        header = data.next()
+        header = next(data)
         drugcol = header.index('drug')
         mutcol = [ i for i, word in enumerate(header) if word.startswith('variant') ][0]
         resistensdic = {}
@@ -440,14 +440,14 @@ def GetLineage(mykrobetsvfile):
     """
     with open(mykrobetsvfile, "rU") as infile:
         data = csv.reader(infile,delimiter="\t")
-        header = data.next()
+        header = next(data)
         lineagecol = header.index('lineage')
-        return data.next()[lineagecol]
+        return next(data)[lineagecol]
 
 def GetLineageColl(colltyperfile):
     with open(colltyperfile, "rU") as infile:
         data = csv.reader(infile,delimiter="\t")
-        header = data.next()
+        header = next(data)
         lineagecol = header.index('Lineage')
         lineage = ""
         for row in data:
@@ -549,7 +549,7 @@ def main():
             print("Loading metadata")
             metainfo = csv.reader(metainfofile,delimiter=",")
             metainfodic = {}
-            header = metainfo.next()
+            header = next(metainfo)
             for row in metainfo:
                 rowdic = {header[i]: row[i] for i in range(len(row))}
                 metainfodic[row[0]] = rowdic
