@@ -70,9 +70,9 @@ def CreateOppsummering(resistens, clusterjanei):
     if len(resistens) == 0:
         res = 'Det ble ikke funnet noen resistensmutasjoner.'
     elif len(resistens) == 1:
-        res = 'Det ble funnet mutasjoner som indikerer resistens mot %s.' % resistens.keys()[0]
+        res = 'Det ble funnet mutasjoner som indikerer resistens mot %s.' % list(resistens.keys())[0]
     else:
-        reskeys = resistens.keys()
+        reskeys = list(resistens.keys())
         alleres = ", ".join(["\\textbf{%s}" % r for r in reskeys[:-1]]) + " og \\textbf{%s}." % reskeys[-1]
         res = 'Det ble funnet mutasjoner som indikerer resistens mot {alleres}'.format(alleres=alleres)
 
