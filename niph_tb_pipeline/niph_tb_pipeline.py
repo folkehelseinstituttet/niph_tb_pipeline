@@ -83,8 +83,8 @@ def FindReads():
 
     # Further checks to make sure there is no injection in filenames
     try:
-        assert re.match("^[\w_\-]+(R1_001\.fastq|R1\.fastq)$", R1[0])
-        assert re.match("^[\w_\-]+(R1_001\.fastq|R1\.fastq)$", R2[0])
+        assert re.match("^[\w_\-]+(R1_001\.fastq|R1\.fastq)", R1[0])
+        assert re.match("^[\w_\-]+(R1_001\.fastq|R1\.fastq)", R2[0])
     except AssertionError:
         sys.exit("Isolate names can only contain letters (a-z, A-Z), numbers (0-9), dash (-) and underscore (_)")
 
