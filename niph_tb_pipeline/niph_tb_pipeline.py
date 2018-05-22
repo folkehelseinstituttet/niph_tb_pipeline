@@ -23,6 +23,7 @@ import os
 import sys
 import time
 import csv
+import re
 import Bio
 import ete3
 from subprocess import Popen, PIPE, call
