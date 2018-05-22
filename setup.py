@@ -25,8 +25,7 @@ setup(name='niph_tb_pipeline',
     packages=['niph_tb_pipeline'],
     install_requires=[
         'biopython',
-        'ete3',
-        'colltyper'],
+        'ete3'],
     entry_points={
         'console_scripts': ['niph_tb_pipeline=niph_tb_pipeline.niph_tb_pipeline:main',
                             'json_to_tsv=niph_tb_pipeline.json_to_tsv:main',

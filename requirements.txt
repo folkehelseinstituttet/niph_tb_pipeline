@@ -1,4 +1,2 @@
 biopython
-git+https://github.com/admiralenola/colltyper
 ete3
-
