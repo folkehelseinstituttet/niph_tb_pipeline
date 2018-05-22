@@ -5,7 +5,7 @@
 import sys
 import os
 import time
-from __init__ import __version__ as VERSION
+from .__init__ import __version__ as VERSION
 
 def CreateFooter(metainfo):
     currentdate = time.strftime("%Y-%b-%d")
