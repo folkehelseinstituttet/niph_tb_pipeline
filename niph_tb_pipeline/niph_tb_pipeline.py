@@ -179,9 +179,9 @@ def RunKaiju(R1, R2):
         print("Kaiju results already exists in %s" % os.getcwd())
         return 0
 
-    errorcode = call("%s/kaiju -x -t %s -f %s -i %s -j %s -o kaiju.out -z 8" % (KAIJU_BIN, KAIJU_NODES_DMP, KAIJU_DB_DMI, R1, R2), shell=True)
-    #errorcode = call("kaiju -x -t %s -f %s -i %s -j %s -o kaiju.out -z 8" % (KAIJU_NODES_DMP, KAIJU_DB_DMI, R1, R2), shell=True)
-    errorcode2 = call("%s/kaijuReport -i kaiju.out -o kaiju.summary -t %s -n %s -r species" % (KAIJU_BIN, KAIJU_NODES_DMP, KAIJU_NAMES_DMP), shell=True)
+    #errorcode = call("%s/kaiju -x -t %s -f %s -i %s -j %s -o kaiju.out -z 8" % (KAIJU_BIN, KAIJU_NODES_DMP, KAIJU_DB_DMI, R1, R2), shell=True)
+    errorcode = call("kaiju -x -t %s -f %s -i %s -j %s -o kaiju.out -z 8" % (KAIJU_NODES_DMP, KAIJU_DB_DMI, R1, R2), shell=True)
+    errorcode2 = call("kaijuReport -i kaiju.out -o kaiju.summary -t %s -n %s -r species" % (KAIJU_NODES_DMP, KAIJU_NAMES_DMP), shell=True)
 
     try:
         call("rm kaiju.out",shell=True)
