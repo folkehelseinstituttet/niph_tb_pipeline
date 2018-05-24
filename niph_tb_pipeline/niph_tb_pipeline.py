@@ -37,7 +37,7 @@ KAIJU_NAMES_DMP = "/mnt/kaijudb/names.dmp"
 KAIJU_BIN = "/opt/kaiju/bin"
 TB_REF = "/mnt/Reference/M_tuberculosis_H37Rv.gb"
 TB_EXCLUDECOLS = "/mnt/Reference/Trimal_excludecolumns.txt"
-MCCORTEX31_PATH = "/opt/Mykrobe-predictor/mccortex/bin/mccortex31"
+#MCCORTEX31_PATH = "/opt/Mykrobe-predictor/mccortex/bin/mccortex31"
 FIGTREE_EXEC = "java -jar /mnt/FigTree_v1.4.3/lib/figtree.jar"
 GLOBAL_COLLECTION = "/mnt/global_collection"
 TEX_TEMPLATE_DIR = "/mnt/Latex_template"
@@ -227,7 +227,8 @@ def RunMykrobe(R1, R2, sampleName):
     if os.path.isfile("mykrobe_output.tsv"):
         print("Mykrobe predictor results already exists in %s" % os.getcwd())
         return 0
-    errorcode1 = call("mykrobe predict %s tb --mccortex31_path %s -1 %s %s > mykrobe_output.json" % (sampleName, MCCORTEX31_PATH, R1, R2), shell=True)
+    #errorcode1 = call("mykrobe predict %s tb --mccortex31_path %s -1 %s %s > mykrobe_output.json" % (sampleName, MCCORTEX31_PATH, R1, R2), shell=True)
+    errorcode1 = call("mykrobe predict %s tb -1 %s %s > mykrobe_output.json" % (sampleName, R1, R2), shell=True)
     errorcode2 = call("json_to_tsv mykrobe_output.json > mykrobe_output.tsv", shell=True)
     errorcode3 = call("rm -rf atlas", shell=True)
     if os.path.isfile("mykrobe_output.tsv"):
