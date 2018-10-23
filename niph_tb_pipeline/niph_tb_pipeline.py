@@ -300,6 +300,33 @@ def CopyToGlobalDir(sample):
         call("cp %s/snippy/snps.aligned.fa %s/%s/snps.aligned.fa" % (sample, GLOBAL_COLLECTION, sample), shell=True)
     # call("ln -s %s %s/%s/" % (SNIPPY_REF_DIR, GLOBAL_COLLECTION, sample), shell=True) # NOT NEEDED FOR DOCKER VERSION
 
+def CopyForEasyGlobalDirMove(sample):
+    '''Method that copies all relevant GLOBAL_COLLECTION data to one folder, and additionally all relevant reports to another folder'''
+    if not os.path.isdir("COPY_TO_TB_PIPELINE_DATABASE/%s" % sample):
+        call("mkdir COPY_TO_TB_PIPELINE_DATABASE/%s" % sample, shell=True)
+    files = os.listdir(sample)
+    for fil in files:
+        if fil.endswith(".fastq"):
+            continue
+        if fil.endswith(".gz"):
+            continue
+        if fil.endswith(".out"):
+            continue
+        if fil.endswith("snippy"):
+            continue
+        if fil.endswith("atlas"):
+            continue
+        if fil.endswith("tmp"):
+            continue
+        if fil.endswith("fastqc"):
+            continue
+        if fil.endswith("template"):
+            continue
+        if fil.endswith("pdf"):
+        	call("cp -rf %s/%s COPY_TO_REPORTS/%s" % (sample, fil, fil), shell=True)
+        if not os.path.isfile("COPY_TO_TB_PIPELINE_DATABASE/%s/%s" % (sample, fil)):
+            call("cp -rf %s/%s COPY_TO_TB_PIPELINE_DATABASE/%s/%s" % (sample, fil, sample, fil), shell=True)
+
 def CopySnippyDataToShallowDir(sample):
     if os.path.isfile("%s/snippy/snps.tab" % sample):
         errorcode1 = call("mv %s/snippy/snps.tab %s/snps.tab" % (sample, sample), shell=True)
@@ -523,6 +550,10 @@ def main():
     timestamp = time.strftime("%d_%b_%Y")
 
     dirs = next(os.walk(basedir))[1]
+    # Create directory that will hold data to go into global database
+    call("mkdir COPY_TO_TB_PIPELINE_DATABASE", shell=True)
+    # Create directory that will hold all new reports
+    call("mkdir COPY_TO_REPORTS", shell=True)
 
     for sample in dirs:
         print("Running sample %s" % sample)
@@ -595,6 +626,9 @@ def main():
         clusterjanei = relationtoothers["somewhat"] > 0
 
         FinalizeSampleReport(sample, metainfodic[sample], pimpedresdic, clusterjanei, lin, relationtoothers, covdic[sample])
+
+        # Finally, copy data that goes to global directory/reports
+        CopyForEasyGlobalDirMove(sample)
         
     print("Finished")
 
