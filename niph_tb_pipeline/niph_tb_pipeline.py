@@ -270,6 +270,7 @@ def sampleAnalysis(sample):
         sys.exit("Failed to go out of directory: %s" % sample)
 
 def CopyToGlobalDir(sample):
+    '''Method that copies results to global dir. Needs to be amended because no longer write access'''
 
     if not os.path.isdir("%s/%s" % (GLOBAL_COLLECTION, sample)):
         call("mkdir %s/%s" % (GLOBAL_COLLECTION, sample), shell=True)
@@ -325,7 +326,7 @@ def RunSnippyCore(basedir, timestamp):
     #except:
     #    sys.exit("Unable to move to global collection dir: %s" % GLOBAL_COLLECTION)
     if not os.path.isfile("snippy-core.log"):
-        errorcode1 = call("snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa %s/* 2> snippy-core.log" % (timestamp, GLOBAL_COLLECTION), shell=True)
+        errorcode1 = call("snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa %s/* ./* 2> snippy-core.log" % (timestamp, GLOBAL_COLLECTION), shell=True)
     
     # Mask bad regions in full alignment
     if os.path.isfile("TB_all_%s.full.aln" % timestamp):
@@ -483,6 +484,7 @@ def NumberRelated(sample, dists):
 
 
 def FinalizeSampleReport(sample, metainfo, resdic, clusterjanei, lineage, relationtoothers, covdicsample):
+    '''Runs TeX scripts to actually create the report. Needs to be amended due to no write access to GLOBAL_COLLECTION'''
     try:
         os.chdir("./%s" % (sample))
     except:
@@ -502,7 +504,8 @@ def FinalizeSampleReport(sample, metainfo, resdic, clusterjanei, lineage, relati
         sys.exit("Unable to move in tex directory of %s" % sample)
     call("pdflatex tb-wgs-report.tex > /dev/null 2>&1", shell=True)
     call("cp tb-wgs-report.pdf ../%s-tb-wgs-report.pdf" % sample, shell=True)
-    call("cp tb-wgs-report.pdf %s/%s/%s-tb-wgs-report.pdf" % (GLOBAL_COLLECTION, sample, sample), shell=True)
+    # NOTE: Following needs to be amended due to no write access
+    #call("cp tb-wgs-report.pdf %s/%s/%s-tb-wgs-report.pdf" % (GLOBAL_COLLECTION, sample, sample), shell=True)
     try:
         os.chdir("../..")
     except:
@@ -527,7 +530,8 @@ def main():
         sampleAnalysis(sample)
 
         # When done with individual analyses, copy all results to Global dir
-        CopyToGlobalDir(sample)
+        # NOTE: Removed CopyToGlobalDir function due to no write access
+        #CopyToGlobalDir(sample)
         CopySnippyDataToShallowDir(sample)
     
     RunSnippyCore(basedir, timestamp)
