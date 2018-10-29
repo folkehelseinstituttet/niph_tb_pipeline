@@ -49,10 +49,10 @@ def CreateInfo(metainfo, covdicsample):
         RD = "N/A"
 
     infostring = '''
-    ID for pr\\o ve    &  {SampleName}    & Perc. aligned          & {percentage_aligned}           \\\ \hline
+    ID for pr\\o ve    &  {SampleName}    & Perc. aligned          & {percentage_aligned:.2f}           \\\ \hline
     Variants   & {num_variants}         & Bases low cov       & {bases_lowcov}          \\\ \hline
     Datakvalitet & {DataQual}       & Bases het & {bases_het}      \\\ \hline
-    Read depth  & {Readdepth}       & Dato  & {currentdate}  \\\ \hline
+    Read depth  & {Readdepth:.2f}       & Dato  & {currentdate}  \\\ \hline
     '''
 
     infostringfull = infostring.format(
