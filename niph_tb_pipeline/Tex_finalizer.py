@@ -31,7 +31,7 @@ def CreateInfo(metainfo, covdicsample):
     elif os.path.isfile("Kaijucontaminationproblem"):
         DataQual = "Mulig kontaminasjon"
     #elif covdicsample < 90.00:
-    elif percentage_aligned < 90.00
+    elif percentage_aligned < 90.00:
         DataQual = "Lav ref. coverage"
     else:
         DataQual = "OK"
