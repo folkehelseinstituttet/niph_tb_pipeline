@@ -326,7 +326,7 @@ def CopyForEasyGlobalDirMove(sample):
         if fil.endswith("template"):
             continue
         if fil.endswith("pdf"):
-        	call("cp -rf %s/%s COPY_TO_REPORTS/%s" % (sample, fil, fil), shell=True)
+            call("cp -rf %s/%s COPY_TO_REPORTS/%s" % (sample, fil, fil), shell=True)
         if not os.path.isfile("COPY_TO_TB_PIPELINE_DATABASE/%s/%s" % (sample, fil)):
             call("cp -rf %s/%s COPY_TO_TB_PIPELINE_DATABASE/%s/%s" % (sample, fil, sample, fil), shell=True)
 
@@ -564,10 +564,10 @@ def main():
     call("mkdir COPY_TO_REPORTS", shell=True)
 
     for sample in dirs:
-    	if "COPY_TO_TB_PIPELINE_DATABASE" in sample:
-    		continue
-    	if "COPY_TO_REPORTS" in sample:
-    		continue
+        if "COPY_TO_TB_PIPELINE_DATABASE" in sample:
+            continue
+        if "COPY_TO_REPORTS" in sample:
+            continue
         print("Running sample %s" % sample)
 
         sampleAnalysis(sample)
