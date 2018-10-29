@@ -357,13 +357,18 @@ def RunSnippyCore(basedir, timestamp):
     #    os.chdir(GLOBAL_COLLECTION)
     #except:
     #    sys.exit("Unable to move to global collection dir: %s" % GLOBAL_COLLECTION)
+    print("Running snippy-core")
+
     dirs = next(os.walk(basedir))[1]
     dirs.remove("COPY_TO_REPORTS")
     dirs.remove("COPY_TO_TB_PIPELINE_DATABASE")
     dirs = " ".join(dirs)
     if not os.path.isfile("snippy-core.log"):
-        errorcode1 = call("snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa --mask=/mnt/Reference/Trimal_excludecolumns.bed %s/* %s 2> snippy-core.log" % (timestamp, GLOBAL_COLLECTION, dirs), shell=True)
-    
+        try:
+            errorcode1 = call("snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa --mask=/mnt/Reference/Trimal_excludecolumns.bed %s/* %s 2> snippy-core.log" % (timestamp, GLOBAL_COLLECTION, dirs), shell=True)
+        except:
+            print("Command failed: snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa --mask=/mnt/Reference/Trimal_excludecolumns.bed %s/* %s 2> snippy-core.log" % (timestamp, GLOBAL_COLLECTION, dirs))
+            sys.exit("Snippy-core failed for unknown reason. See snippy-core log file")
     # Mask bad regions in full alignment
     # (LEGACY) (No longer needed since snippy-core can do this automatically)
     #if os.path.isfile("TB_all_%s.full.aln" % timestamp):
