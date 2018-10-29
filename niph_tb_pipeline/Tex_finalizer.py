@@ -16,6 +16,12 @@ def CreateFooter(metainfo):
 
 def CreateInfo(metainfo, covdicsample):
     # DataQual should be assessed from presence of Fastqc / kaiju problem files
+    num_variants = covdicsample["VARIANT"]
+    bases_lowcov = covdicsample["LOWCOV"]
+    bases_het = covdicsample["HET"]
+    percentage_aligned = covdicsample["ALIGNED"] / (covdicsample["LENGTH"] - covdicsample["MASKED"])
+    percentage_lowqual = covdicsample["LOWCOV"] / (covdicsample["LENGTH"] - covdicsample["MASKED"])
+
     if os.path.isfile("Fastqc_problems"):
         DataQual = "Lav output"
     elif os.path.isfile("Kaijuclassificationproblem"):
@@ -24,7 +30,8 @@ def CreateInfo(metainfo, covdicsample):
         DataQual = "Annen mykobakterie"
     elif os.path.isfile("Kaijucontaminationproblem"):
         DataQual = "Mulig kontaminasjon"
-    elif covdicsample < 90.00:
+    #elif covdicsample < 90.00:
+    elif percentage_aligned < 90.00
         DataQual = "Lav ref. coverage"
     else:
         DataQual = "OK"
@@ -42,19 +49,19 @@ def CreateInfo(metainfo, covdicsample):
         RD = "N/A"
 
     infostring = '''
-    ID for pr\\o ve    &  {SampleName}    & Barcode          & {Barcode}           \\\ \hline
-    Sted   & {Location}         & Isolert fra       & {LocatedFrom}          \\\ \hline
-    Datakvalitet & {DataQual}       & Pr\\o vetakningsdato & {Isolationdate}      \\\ \hline
+    ID for pr\\o ve    &  {SampleName}    & Perc. aligned          & {percentage_aligned}           \\\ \hline
+    Variants   & {num_variants}         & Bases low cov       & {bases_lowcov}          \\\ \hline
+    Datakvalitet & {DataQual}       & Bases het & {bases_het}      \\\ \hline
     Read depth  & {Readdepth}       & Dato  & {currentdate}  \\\ \hline
     '''
 
     infostringfull = infostring.format(
         SampleName = ID,
-        Barcode = Barcode,
-        Location = Location,
-        LocatedFrom = LocatedFrom,
+        percentage_aligned = percentage_aligned,
+        num_variants = num_variants,
+        bases_lowcov = bases_lowcov,
         DataQual = DataQual,
-        Isolationdate = Isolationdate,
+        bases_het = bases_het,
         Readdepth = RD,
         currentdate = time.strftime("%Y-%b-%d"))
     with open("Latex_template/include/info.tex","w") as outfile:

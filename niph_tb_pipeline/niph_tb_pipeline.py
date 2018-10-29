@@ -398,6 +398,33 @@ def RunSnippyCore(basedir, timestamp):
     #except:
     #    sys.exit("Unable to move back from global collection to %s " % basedir)
 
+def ReadSnippyCoreLog():
+    """ LEGACY method. Reads snippy-core log to get % coverage"""
+    with open("snippy-core.log","rU") as snippycorelogfile:
+        print("Reading snippy-core log")
+        snippyloglines = snippycorelogfile.readlines()
+        covdic = {}
+        for l in snippyloglines:
+            if "coverage" not in l:
+                continue
+            else:
+                l2 = l.split("\t")[1] # Get information part
+                l2s = l2.split(" ")
+                covdic[l2s[0]] = float(l2s[4][:-2]) # Remove % and \n
+    return covdic
+
+def ReadSnippyCoreCov(timestamp):
+    """ NEW method for getting % cov from snippy-core. Uses .txt file"""
+    with open("TB_all_%s.txt" % (timestamp), "rU") as txtfile:
+        print("Reading coverage information")
+        data = csv.reader(txtfile, delimiter="\t")
+        header = next(data)
+        #covdickeys = {key:i for i,key in enumerate(header)}
+        covdic = {}
+        for line in data:
+            covdic[ line[0] ] = { header[i]: int(line[i]) for i in range(1,len(header))  }
+        return covdic
+
 def RunSnpDists():
     print("Finding distances between all isolates in global collection")
     errorcode = call("snp-dists -c TB_all*.aln > TB_all_dists.csv", shell=True)
@@ -615,17 +642,20 @@ def main():
         for sample in dirs:
             metainfodic[sample] = {"ID": sample, "Barcode":"","Location":"","Source":"","Isolated":""}
 
-    with open("snippy-core.log","rU") as snippycorelogfile:
-        print("Reading snippy-core log")
-        snippyloglines = snippycorelogfile.readlines()
-        covdic = {}
-        for l in snippyloglines:
-            if "coverage" not in l:
-                continue
-            else:
-                l2 = l.split("\t")[1] # Get information part
-                l2s = l2.split(" ")
-                covdic[l2s[0]] = float(l2s[4][:-2]) # Remove % and \n
+    # with open("snippy-core.log","rU") as snippycorelogfile:
+    ## LEGACY - moved to ReadSnippyCoreLog
+    #     print("Reading snippy-core log")
+    #     snippyloglines = snippycorelogfile.readlines()
+    #     covdic = {}
+    #     for l in snippyloglines:
+    #         if "coverage" not in l:
+    #             continue
+    #         else:
+    #             l2 = l.split("\t")[1] # Get information part
+    #             l2s = l2.split(" ")
+    #             covdic[l2s[0]] = float(l2s[4][:-2]) # Remove % and \n
+
+    covdic = ReadSnippyCoreCov(timestamp)
 
     print("Finalizing reports for each strain")
 
