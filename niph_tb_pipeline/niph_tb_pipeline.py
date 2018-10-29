@@ -197,7 +197,7 @@ def RunSnippy(R1, R2):
     if os.path.isdir("snippy"):
         print("Snippy results already exits in %s" % os.getcwd())
         return 0
-    errorcode = call("snippy --outdir ./snippy --ref %s --pe1 %s --pe2 %s" % (TB_REF, R1, R2), shell=True) # REMOVED --cleanup (Needed for samtools depth - Remove BAM files later in script)
+    errorcode = call("snippy --outdir ./snippy --ref %s --R1 %s --R2 %s" % (TB_REF, R1, R2), shell=True) # REMOVED --cleanup (Needed for samtools depth - Remove BAM files later in script)
 
 def FindCoverage():
     print("Checking coverage")
@@ -205,7 +205,9 @@ def FindCoverage():
         print("Average depth already calculated")
         return 0
     #errorcode = call("gzip -cd snippy/snps.depth.gz | awk '{sum+=$3; sumsq+=$3*$3} END { print sum/NR; print sqrt(sumsq/NR - (sum/NR)**2)}' > averagedepth.txt", shell=True)
-    errorcode = call("gzip -cd snippy/snps.depth.gz | awk '{sum+=$3} END { print sum/NR}' > averagedepth.txt", shell=True)
+    errorcode1 = call("samtools depth -aa snippy/snps.bam > snippy/snps.depth", shell=True)
+    #errorcode = call("gzip -cd snippy/snps.depth.gz | awk '{sum+=$3} END { print sum/NR}' > averagedepth.txt", shell=True)
+    errorcode2 = call("cat snippy/snps.depth | awk '{sum+=$3} END { print sum/NR}' > averagedepth.txt", shell=True)
 
 def CleanupSnippyData():
     print("Cleaning up snippy data")
@@ -215,7 +217,8 @@ def CleanupSnippyData():
     errorcode1 = call("rm -rf snippy/reference/ref/", shell=True)
     errorcode2 = call("rm -rf snippy/reference/genomes/", shell=True)
     errorcode3 = call("rm snippy/reference/ref.fa.*", shell=True)
-    errorcode4 = call("rm snippy/snps.*.tbi", shell=True)
+    #errorcode4 = call("rm snippy/snps.*.tbi", shell=True)
+    errorcode4 = call("rm snippy/snps.depth", shell=True)
     errorcode5 = call("rm snippy/snps.*.gz", shell=True)
     errorcode6 = call("rm snippy/snps.consensus*.fa", shell=True)
     errorcode7 = call("rm snippy/snps.bam", shell=True)
@@ -332,6 +335,8 @@ def CopySnippyDataToShallowDir(sample):
         errorcode1 = call("mv %s/snippy/snps.tab %s/snps.tab" % (sample, sample), shell=True)
     if os.path.isfile("%s/snippy/snps.aligned.fa" % sample):
         errorcode2 = call("mv %s/snippy/snps.aligned.fa %s/snps.aligned.fa" % (sample, sample), shell=True)
+    if os.path.isfile("%s/snippy/snps.vcf" % sample):
+        errorcode1 = call("mv %s/snippy/snps.vcf %s/snps.vcf" % (sample, sample), shell=True)
 
 def MaskRepetitiveRegions(alnfile):
     '''This method is not yet complete'''
@@ -353,15 +358,16 @@ def RunSnippyCore(basedir, timestamp):
     #except:
     #    sys.exit("Unable to move to global collection dir: %s" % GLOBAL_COLLECTION)
     if not os.path.isfile("snippy-core.log"):
-        errorcode1 = call("snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa %s/* ./* 2> snippy-core.log" % (timestamp, GLOBAL_COLLECTION), shell=True)
+        errorcode1 = call("snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa --mask=/mnt/Reference/Trimal_excludecolumns.bed %s/* ./* 2> snippy-core.log" % (timestamp, GLOBAL_COLLECTION), shell=True)
     
     # Mask bad regions in full alignment
-    if os.path.isfile("TB_all_%s.full.aln" % timestamp):
-        if not os.path.isfile("TB_all_%s.masked.fasta" % timestamp):
-            maskedfile = MaskRepetitiveRegions("TB_all_%s.full.aln" % timestamp)
+    # (LEGACY) (No longer needed since snippy-core can do this automatically)
+    #if os.path.isfile("TB_all_%s.full.aln" % timestamp):
+    #    if not os.path.isfile("TB_all_%s.masked.fasta" % timestamp):
+    #        maskedfile = MaskRepetitiveRegions("TB_all_%s.full.aln" % timestamp)
     
     # Replace basic SNP alignment with masked SNP alignment
-    replaceOldSNPalignment("TB_all_%s.masked.fasta" % timestamp, "TB_all_%s.aln" % timestamp)
+    #replaceOldSNPalignment("TB_all_%s.masked.fasta" % timestamp, "TB_all_%s.aln" % timestamp)
 
     # Discard whole-genome alignment
     if os.path.isfile("TB_all_%s.full.aln" % timestamp):
@@ -372,8 +378,10 @@ def RunSnippyCore(basedir, timestamp):
         errorcode3 = call("FastTree -nt -gtr TB_all_%s.aln > Global_collection_tree.nwk" % (timestamp), shell=True)
     
     # Remove masked file
-    if os.path.isfile("TB_all_%s.masked.fasta" % timestamp):
-        errorcode4 = call("rm TB_all_%s.masked.fasta", shell=True)
+    # (LEGACY) (No longer needed since Snippy-core does this)
+    #if os.path.isfile("TB_all_%s.masked.fasta" % timestamp):
+    #    errorcode4 = call("rm TB_all_%s.masked.fasta", shell=True)
+    
     #errorcode4 = call("mv TB_all* %s" % basedir, shell=True)
     #errorcode5 = call("mv snippy-core.log %s" % basedir, shell=True)
     #try:
@@ -556,6 +564,10 @@ def main():
     call("mkdir COPY_TO_REPORTS", shell=True)
 
     for sample in dirs:
+    	if "COPY_TO_TB_PIPELINE_DATABASE" in sample:
+    		continue
+    	if "COPY_TO_REPORTS" in sample:
+    		continue
         print("Running sample %s" % sample)
 
         sampleAnalysis(sample)
