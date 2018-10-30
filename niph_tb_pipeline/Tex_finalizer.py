@@ -19,7 +19,7 @@ def CreateInfo(metainfo, covdicsample):
     num_variants = covdicsample["VARIANT"]
     bases_lowcov = covdicsample["LOWCOV"]
     bases_het = covdicsample["HET"]
-    percentage_aligned = covdicsample["ALIGNED"] / (covdicsample["LENGTH"] - covdicsample["MASKED"])
+    percentage_aligned = covdicsample["ALIGNED"] / (covdicsample["LENGTH"] - covdicsample["MASKED"]) * 100
     percentage_lowqual = covdicsample["LOWCOV"] / (covdicsample["LENGTH"] - covdicsample["MASKED"])
 
     if os.path.isfile("Fastqc_problems"):
