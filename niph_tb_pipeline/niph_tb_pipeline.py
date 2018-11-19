@@ -368,9 +368,9 @@ def RunSnippyCore(basedir, timestamp):
     dirs = " ".join(dirs)
     globaldirs = next(os.walk(GLOBAL_COLLECTION))[1]
     if len(globaldirs) == 0:
-    	globaldirstxt = ""
+        globaldirstxt = ""
     else:
-    	globaldirstxt = " ".join([GLOBAL_COLLECTION + "/" + g for g in globaldirs])
+        globaldirstxt = " ".join([GLOBAL_COLLECTION + "/" + g for g in globaldirs])
 
     if not os.path.isfile("snippy-core.log"):
         try:
@@ -603,10 +603,16 @@ def main():
     timestamp = time.strftime("%d_%b_%Y")
 
     dirs = next(os.walk(basedir))[1]
+    if "COPY_TO_TB_PIPELINE_DATABASE" in dirs:
+        dirs.remove("COPY_TO_TB_PIPELINE_DATABASE")
+    if "COPY_TO_REPORTS" in dirs:
+        dirs.remove("COPY_TO_REPORTS")
     # Create directory that will hold data to go into global database
-    call("mkdir COPY_TO_TB_PIPELINE_DATABASE", shell=True)
+    if not os.path.isdir("COPY_TO_TB_PIPELINE_DATABASE"):
+        call("mkdir COPY_TO_TB_PIPELINE_DATABASE", shell=True)
     # Create directory that will hold all new reports
-    call("mkdir COPY_TO_REPORTS", shell=True)
+    if not os.path.isdir("COPY_TO_REPORTS"):
+        call("mkdir COPY_TO_REPORTS", shell=True)
 
     for sample in dirs:
         if "COPY_TO_TB_PIPELINE_DATABASE" in sample:
