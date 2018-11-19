@@ -374,18 +374,20 @@ def RunSnippyCore(basedir, timestamp):
 
     if not os.path.isfile("snippy-core.log"):
         try:
-            errorcode1 = call("snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa --mask=/mnt/Reference/Trimal_excludecolumns.bed %s %s 2> snippy-core.log" % (timestamp, globaldirstxt, dirs), shell=True)
+            #errorcode1 = call("snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa --mask=/mnt/Reference/Trimal_excludecolumns.bed %s %s 2> snippy-core.log" % (timestamp, globaldirstxt, dirs), shell=True)
+            errorcode1 = call("snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa %s %s 2> snippy-core.log" % (timestamp, globaldirstxt, dirs), shell=True)
         except:
-            print("Command failed: snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa --mask=/mnt/Reference/Trimal_excludecolumns.bed %s %s 2> snippy-core.log" % (timestamp, globaldirstxt, dirs))
+            #print("Command failed: snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa --mask=/mnt/Reference/Trimal_excludecolumns.bed %s %s 2> snippy-core.log" % (timestamp, globaldirstxt, dirs))
+            print("Command failed: snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa %s %s 2> snippy-core.log" % (timestamp, globaldirstxt, dirs))
             sys.exit("Snippy-core failed for unknown reason. See snippy-core log file")
     # Mask bad regions in full alignment
-    # (LEGACY) (No longer needed since snippy-core can do this automatically)
-    #if os.path.isfile("TB_all_%s.full.aln" % timestamp):
-    #    if not os.path.isfile("TB_all_%s.masked.fasta" % timestamp):
-    #        maskedfile = MaskRepetitiveRegions("TB_all_%s.full.aln" % timestamp)
+    # (LEGACY) (No longer needed since snippy-core can do this automatically) NOTE - NOT TRUE - STILL USE
+    if os.path.isfile("TB_all_%s.full.aln" % timestamp):
+        if not os.path.isfile("TB_all_%s.masked.fasta" % timestamp):
+            maskedfile = MaskRepetitiveRegions("TB_all_%s.full.aln" % timestamp)
     
-    # Replace basic SNP alignment with masked SNP alignment
-    #replaceOldSNPalignment("TB_all_%s.masked.fasta" % timestamp, "TB_all_%s.aln" % timestamp)
+    # Replace basic SNP alignment with masked FULL alignment
+    replaceOldSNPalignment("TB_all_%s.masked.fasta" % timestamp, "TB_all_%s.aln" % timestamp)
 
     # Discard whole-genome alignment
     if os.path.isfile("TB_all_%s.full.aln" % timestamp):
@@ -435,8 +437,9 @@ def ReadSnippyCoreCov(timestamp):
         return covdic
 
 def RunSnpDists():
+	''' Should be based on FULL alignment (with masked regions) rather than post snp-dists version'''
     print("Finding distances between all isolates in global collection")
-    errorcode = call("snp-dists -c TB_all*.aln > TB_all_dists.csv", shell=True)
+    errorcode = call("snp-dists -c TB_all*.masked.fasta > TB_all_dists.csv", shell=True)
 
 def ReadSnpDistsObject(dists):
     header = next(dists)[1:]
