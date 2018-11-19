@@ -45,8 +45,9 @@ def CreateInfo(metainfo, covdicsample):
     if os.path.isfile("averagedepth.txt"):
         with open("averagedepth.txt", "rU") as rdfile:
             RD = rdfile.readlines()[0].rstrip("\n")
+            RD = float(RD)
     else:
-        RD = "N/A"
+        RD = 0.0
 
     infostring = '''
     ID for pr\\o ve    &  {SampleName}    & Perc. aligned          & {percentage_aligned:.2f}           \\\ \hline
