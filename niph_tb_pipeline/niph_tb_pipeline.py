@@ -366,11 +366,17 @@ def RunSnippyCore(basedir, timestamp):
     dirs.remove("COPY_TO_REPORTS")
     dirs.remove("COPY_TO_TB_PIPELINE_DATABASE")
     dirs = " ".join(dirs)
+    globaldirs = next(os.walk(GLOBAL_COLLECTION))[1]
+    if len(globaldirs) == 0:
+    	globaldirstxt = ""
+    else:
+    	globaldirstxt = " ".join([GLOBAL_COLLECTION + "/" + g for g in globaldirs])
+
     if not os.path.isfile("snippy-core.log"):
         try:
-            errorcode1 = call("snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa --mask=/mnt/Reference/Trimal_excludecolumns.bed %s/* %s 2> snippy-core.log" % (timestamp, GLOBAL_COLLECTION, dirs), shell=True)
+            errorcode1 = call("snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa --mask=/mnt/Reference/Trimal_excludecolumns.bed %s %s 2> snippy-core.log" % (timestamp, globaldirstxt, dirs), shell=True)
         except:
-            print("Command failed: snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa --mask=/mnt/Reference/Trimal_excludecolumns.bed %s/* %s 2> snippy-core.log" % (timestamp, GLOBAL_COLLECTION, dirs))
+            print("Command failed: snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa --mask=/mnt/Reference/Trimal_excludecolumns.bed %s %s 2> snippy-core.log" % (timestamp, globaldirstxt, dirs))
             sys.exit("Snippy-core failed for unknown reason. See snippy-core log file")
     # Mask bad regions in full alignment
     # (LEGACY) (No longer needed since snippy-core can do this automatically)
