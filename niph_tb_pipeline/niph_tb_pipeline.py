@@ -93,16 +93,19 @@ def FindReads():
     return {"R1": R1[0], "R2": R2[0]}
 
 def ReadSummary(summary):
-    with open(summary,"rU") as f:
-        myf = f.read()
-        if myf[:4] == "PASS":
-            return 0
-        elif myf[:4] == "WARN":
-            return 1
-        elif myf[:4] == "FAIL":
-            return 2
-        else:
-            return -1
+    try:
+        with open(summary,"rU") as f:
+            myf = f.read()
+            if myf[:4] == "PASS":
+                return 0
+            elif myf[:4] == "WARN":
+                return 1
+            elif myf[:4] == "FAIL":
+                return 2
+            else:
+                return -1
+    except FileNotFoundError:
+        return -1
 
 def RemoveFastqSuffix(file):
     if file.endswith(".fastq"):
