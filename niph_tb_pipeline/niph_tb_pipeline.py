@@ -437,7 +437,7 @@ def ReadSnippyCoreCov(timestamp):
         return covdic
 
 def RunSnpDists():
-	''' Should be based on FULL alignment (with masked regions) rather than post snp-dists version'''
+    ''' Should be based on FULL alignment (with masked regions) rather than post snp-dists version'''
     print("Finding distances between all isolates in global collection")
     errorcode = call("snp-dists -c TB_all*.masked.fasta > TB_all_dists.csv", shell=True)
 
