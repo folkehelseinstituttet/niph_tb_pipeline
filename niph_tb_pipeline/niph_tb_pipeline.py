@@ -226,7 +226,8 @@ def CleanupSnippyData():
     errorcode6 = call("rm snippy/snps.consensus*.fa", shell=True)
     errorcode7 = call("rm snippy/snps.bam", shell=True)
     errorcode8 = call("rm snippy/snps.bam.bai", shell=True)
-    errorcode9 = call("rm snippy/snps.raw.vcf", shell=True)
+    # Dont remove raw.vcf - Has important heterozygous information
+    #errorcode9 = call("rm snippy/snps.raw.vcf", shell=True)
 
 def RunMykrobe(R1, R2, sampleName):
     # Check if mykrobe predictor results already exists:
@@ -245,7 +246,9 @@ def CollType():
     if os.path.isfile("colltype.txt"):
         print("Coll type already calculated")
         return 0
-    errorcode = call("colltyper -o colltype.txt snippy/snps.vcf", shell=True)
+    #errorcode = call("colltyper -o colltype.txt snippy/snps.vcf", shell=True)
+    # USE unfiltered VCF file to find mixed infections
+    errorcode = call("colltyper -o colltype.txt snippy/snps.raw.vcf", shell=True)
 
 def sampleAnalysis(sample):
     
