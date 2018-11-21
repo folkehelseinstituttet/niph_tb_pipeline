@@ -97,12 +97,44 @@ def CreateTyping(lineage):
     #lineage = lineage.replace("_","-")
     #if lineage is None:
     lineage = lineage.replace("_","\\_")
+    mix = EvaluateLineageMix(lineage)
     if lineage == "":
         typing = 'Pr\\o ven ble ikke entydig typet til en bestemt lineage. '
     else:
         typing = 'Pr\\o ven ble funnet\ \\aa\ tilh\\o re lineage %s. ' % (lineage)
+    if mix:
+        typing += 'Pr\\o ven kan v\\ae re en blanding av ulike samples. '
     with open("Latex_template/include/typing.tex","w") as outfile:
         outfile.write(typing)
+
+def EvaluateLineageMix(lineage):
+    '''Takes the lineage text and evaluates whether there is a mix of different lineages (e.g. 4.7 and 3.2)'''
+    lintab = lineage.split(" / ")
+    # Finding even one non-fit indicates a possible mix
+    # Start with the first, iterate over the rest to check all pairs
+    for i in range(len(lintab)):
+        for j in range(i, len(lintab)):
+            if TwoLineagesMix(i,j):
+                return True
+    return False
+
+def TwoLineagesMix(i,j):
+    '''Evaluate if lineage i and j are compatible or not'''
+    # Add catch for BOV and BOV\\_AFRI
+    if "BOV" in i and "BOV" in j:
+        return False
+    isplit = i.split('.')
+    jsplit = j.split('.')
+    largest = max(len(isplit),len(jsplit))
+    if len(isplit) == largest:
+        for elem in range(len(jsplit)):
+            if not jsplit[elem] == isplit[elem]:
+                return True
+    else:
+        for elem in range(len(isplit)):
+            if not isplit[elem] == jsplit[elem]:
+                return True
+    return False
     
 def CreateResistensBokser(resistens):
     # Figure out the appropriate box:
