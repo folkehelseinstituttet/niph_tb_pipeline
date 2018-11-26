@@ -194,6 +194,27 @@ def RunKaiju(R1, R2):
     # Analyze Kaiju
     AnalyzeKaijuReport("kaiju.summary")
 
+def RunMash(R1, R2):
+    '''Convert species identification to MASH instead. NOT USED'''
+    print("Checking species ID with MASH")
+    if os.path.isfile("mashreport.tab"):
+        print("Mash results already exists in %s" % os.getcwd())
+        return 0
+
+    errorcode1 = call("cat %s %s | mash screen -p 4 %s | sort -gr - | head > mashreport.tab" % (R1, R2, MASH_DB), shell=True)
+    with open("mashreport.tab","rU") as mf:
+        data = csv.reader(mf, delimiter="\t")
+        tophit = next(data)
+        topmatch = CaptureMashHit(tophit[5])
+
+    return topmatch
+
+def CaptureMashHit(string):
+    '''Method for capturing a binomial name from MASH screen results. NOT USED'''
+    pattern = "[A-Z][a-z]* [a-z]*( strain)?( BCG)?(-1)?( subsp\. \w+)?"
+    match = re.search(pattern,string)[0]
+    return match
+
 
 def RunSnippy(R1, R2):
     # Check if snippy dir exists already:
@@ -532,6 +553,15 @@ def GetLineage(mykrobetsvfile):
         lineagecol = header.index('lineage')
         return next(data)[lineagecol]
 
+def GetSpeciesMykrobe(mykrobetsvfile):
+    '''Get species from Mykrobe predictor'''
+    with open(mykrobetsvfile, "rU") as infile:
+        data = csv.reader(infile,delimiter="\t")
+        header = next(data)
+        speciescol = header.index('species')
+        binomial_name = re.sub("_"," ", next(data)[speciescol])
+        return binomial_name
+
 def GetLineageColl(colltyperfile):
     with open(colltyperfile, "rU") as infile:
         data = csv.reader(infile,delimiter="\t")
@@ -559,7 +589,7 @@ def NumberRelated(sample, dists):
     for key in dists:
         if key == sample:
             continue
-        if int(dists[key]) <= 30:
+        if int(dists[key]) <= 12:
             if int(dists[key]) > 5:
                 related["somewhat"] += 1
             else:
@@ -569,7 +599,7 @@ def NumberRelated(sample, dists):
 
 
 
-def FinalizeSampleReport(sample, metainfo, resdic, clusterjanei, lineage, relationtoothers, covdicsample):
+def FinalizeSampleReport(sample, metainfo, resdic, clusterjanei, lineage, species, relationtoothers, covdicsample):
     '''Runs TeX scripts to actually create the report. Needs to be amended due to no write access to GLOBAL_COLLECTION'''
     try:
         os.chdir("./%s" % (sample))
@@ -582,7 +612,7 @@ def FinalizeSampleReport(sample, metainfo, resdic, clusterjanei, lineage, relati
     call("cp NeighborTreeWhite.png Latex_template/imageFiles/tree.png",shell=True)
 
     # Run TB-finalizer to create tex files
-    Tex_finalizer.CreateReport(metainfo, resdic, clusterjanei, lineage, relationtoothers, covdicsample)
+    Tex_finalizer.CreateReport(metainfo, resdic, clusterjanei, lineage, species, relationtoothers, covdicsample)
     # Create the pdf
     try:
         os.chdir("Latex_template")
@@ -691,13 +721,14 @@ def main():
         # Consider implementing COLL scheme instead
         #lin = GetLineage('%s/mykrobe_output.tsv' % sample)
         lin = GetLineageColl("%s/colltype.txt" % sample)
+        species = GetSpeciesMykrobe('%s/mykrobe_output.tsv' % sample)
 
         # Find out if sample is part of a cluster.
         # Lowest distance is always to self (0)
         relationtoothers = NumberRelated(sample, usedists[sample])
         clusterjanei = relationtoothers["somewhat"] > 0
 
-        FinalizeSampleReport(sample, metainfodic[sample], pimpedresdic, clusterjanei, lin, relationtoothers, covdic[sample])
+        FinalizeSampleReport(sample, metainfodic[sample], pimpedresdic, clusterjanei, lin, species, relationtoothers, covdic[sample])
 
         # Finally, copy data that goes to global directory/reports
         CopyForEasyGlobalDirMove(sample)

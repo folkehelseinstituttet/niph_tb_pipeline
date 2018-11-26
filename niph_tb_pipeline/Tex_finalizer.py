@@ -68,7 +68,7 @@ def CreateInfo(metainfo, covdicsample):
     with open("Latex_template/include/info.tex","w") as outfile:
         outfile.write(infostringfull)
 
-def CreateOppsummering(resistens, clusterjanei):
+def CreateOppsummering(resistens, clusterjanei, species):
 
     if clusterjanei:
         smitte = 'Pr\\o ven tilh\\o rer et sannsynlig smittecluster, noe som antyder \\textbf{nylig smitte}.'
@@ -85,7 +85,9 @@ def CreateOppsummering(resistens, clusterjanei):
         res = 'Det ble funnet mutasjoner som indikerer resistens mot {alleres}'.format(alleres=alleres)
 
     if not os.path.isfile("Kaijuclassificationproblem"):
-        oppsummering = 'Pr\\o ven var positiv for \\textbf{Mycobacterium tuberculosis}. %s %s' % (res, smitte)
+        oppsummering = 'Pr\\o ven var positiv for \\textbf{Mycobacterium tuberculosis-komplekset (MTC)}. %s %s' % (res, smitte)
+        tophit = species
+        oppsummering += 'Beste artstreff var \\textbf{%s}' % species
     else:
         tophit = open("Kaijuclassificationproblem","rU").read()
         oppsummering = 'Pr\\o ven er ikke \\textbf{Mycobacterium tuberculosis}, men \\textbf{%s}. ' % tophit
@@ -112,9 +114,9 @@ def EvaluateLineageMix(lineage):
     lintab = lineage.split(" / ")
     # Finding even one non-fit indicates a possible mix
     # Start with the first, iterate over the rest to check all pairs
-    for i in range(len(lintab)):
-        for j in range(i, len(lintab)):
-            if TwoLineagesMix(i,j):
+    for i in range(len(lintab)-1):
+        for j in range(i+1, len(lintab)):
+            if TwoLineagesMix(lintab[i],lintab[j]):
                 return True
     return False
 
@@ -325,7 +327,7 @@ def CreateBeslektede(relationtoothers):
     text = '''
 Terskelverdi  & Antall tidligere sekvenserte isolater  \\\ \hline 
 N\\ae rt beslektet (0 til 5 mutasjoner forskjell) & \\textbf{%s} isolater \\\ 
-Beslektet (0 til 30 mutasjoner forskjell) & \\textbf{%s} isolater \\\ \hline 
+Beslektet (0 til 12 mutasjoner forskjell) & \\textbf{%s} isolater \\\ \hline 
 ''' % (str(relationtoothers["close"]), str(relationtoothers["somewhat"]))
 
     with open("Latex_template/include/beslektede.tex","w") as outfile:
@@ -353,10 +355,10 @@ Pipeline & {pipeline} & Referansegenom & {ref} \\\ \hline
     with open("Latex_template/include/pipelinedetaljer.tex","w") as outfile:
         outfile.write(text)
 
-def CreateReport(metainfo, resdic, clusterjanei, lineage, relationtoothers, covdicsample):
+def CreateReport(metainfo, resdic, clusterjanei, lineage, species, relationtoothers, covdicsample):
     CreateFooter(metainfo)
     CreateInfo(metainfo, covdicsample)
-    CreateOppsummering(resdic, clusterjanei)
+    CreateOppsummering(resdic, clusterjanei, species)
     CreateTyping(lineage)
     CreateResistensBokser(resdic)
     CreateResistens(resdic)
