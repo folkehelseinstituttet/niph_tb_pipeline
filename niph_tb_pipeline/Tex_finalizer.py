@@ -71,23 +71,23 @@ def CreateInfo(metainfo, covdicsample):
 def CreateOppsummering(resistens, clusterjanei, species):
 
     if clusterjanei:
-        smitte = 'Pr\\o ven tilh\\o rer et sannsynlig smittecluster, noe som antyder \\textbf{nylig smitte}.'
+        smitte = 'Pr\\o ven tilh\\o rer et sannsynlig smittecluster, noe som antyder \\textbf{nylig smitte}. '
     else:
-        smitte = 'Pr\\o ven er ikke n\\ae rt beslektet med tidligere sekvenserte pr\\o ver.'
+        smitte = 'Pr\\o ven er ikke n\\ae rt beslektet med tidligere sekvenserte pr\\o ver. '
 
     if len(resistens) == 0:
-        res = 'Det ble ikke funnet noen resistensmutasjoner.'
+        res = 'Det ble ikke funnet noen resistensmutasjoner. '
     elif len(resistens) == 1:
-        res = 'Det ble funnet mutasjoner som indikerer resistens mot %s.' % list(resistens.keys())[0]
+        res = 'Det ble funnet mutasjoner som indikerer resistens mot %s. ' % list(resistens.keys())[0]
     else:
         reskeys = list(resistens.keys())
         alleres = ", ".join(["\\textbf{%s}" % r for r in reskeys[:-1]]) + " og \\textbf{%s}." % reskeys[-1]
-        res = 'Det ble funnet mutasjoner som indikerer resistens mot {alleres}'.format(alleres=alleres)
+        res = 'Det ble funnet mutasjoner som indikerer resistens mot {alleres} '.format(alleres=alleres)
 
     if not os.path.isfile("Kaijuclassificationproblem"):
-        oppsummering = 'Pr\\o ven var positiv for \\textbf{Mycobacterium tuberculosis-komplekset (MTC)}. %s %s' % (res, smitte)
+        oppsummering = 'Pr\\o ven var positiv for \\textbf{Mycobacterium tuberculosis-komplekset (MTC)}. %s %s ' % (res, smitte)
         tophit = species
-        oppsummering += 'Beste artstreff var \\textbf{%s}' % species
+        oppsummering += 'Beste artstreff var \\textbf{%s} ' % species
     else:
         tophit = open("Kaijuclassificationproblem","rU").read()
         oppsummering = 'Pr\\o ven er ikke \\textbf{Mycobacterium tuberculosis}, men \\textbf{%s}. ' % tophit
