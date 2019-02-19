@@ -221,7 +221,10 @@ def RunMash(R1, R2):
         AnalyzeMashTopHit("mashreport.tab")
         return 0
 
-    errorcode1 = call("mash screen -w -p 4 %s %s %s | sort -gr - > mashreport.tab" % (MASH_REFSEQ_SKETCH, R1, R2), shell=True)
+    errorcode1 = call("mash screen -w -p 4 %s %s %s > mashreport.tab" % (MASH_REFSEQ_SKETCH, R1, R2), shell=True)
+    errorcode2 = call("sort -gr mashreport.tab > mashreport.sorted.tab", shell=True)
+    errorcode3 = call("head mashreport.sorted.tab > mashreport.tab", shell=True)
+    errorcode4 = call("rm mashreport.sorted.tab", shell=True)
     AnalyzeMashTopHit("mashreport.tab")
 
 def ReadMashTopHit(mashreport):
@@ -305,7 +308,7 @@ def RunMykrobe(R1, R2, sampleName):
         print("Mykrobe predictor results already exists in %s" % os.getcwd())
         return 0
     #errorcode1 = call("mykrobe predict %s tb --mccortex31_path %s -1 %s %s > mykrobe_output.json" % (sampleName, MCCORTEX31_PATH, R1, R2), shell=True)
-    errorcode1 = call("mykrobe predict %s tb -1 %s %s > mykrobe_output.json" % (sampleName, R1, R2), shell=True)
+    errorcode1 = call("mykrobe predict %s tb --output mykrobe_output.csv --format csv -1 %s %s" % (sampleName, R1, R2), shell=True)
     errorcode2 = call("json_to_tsv mykrobe_output.json > mykrobe_output.tsv", shell=True)
     errorcode3 = call("rm -rf atlas", shell=True)
     if os.path.isfile("mykrobe_output.tsv"):
