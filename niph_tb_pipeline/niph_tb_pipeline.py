@@ -338,7 +338,7 @@ def sampleAnalysis(sample):
 
     RunFastQC(myfiles["R1"], myfiles["R2"])
     #RunKaiju(myfiles["R1"], myfiles["R2"])
-    RunMash(myfiles["R1", myfiles["R2"]])
+    RunMash(myfiles["R1"], myfiles["R2"])
     RunSnippy(myfiles["R1"], myfiles["R2"])
     FindCoverage()
     CleanupSnippyData()
