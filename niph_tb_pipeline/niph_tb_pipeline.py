@@ -221,7 +221,7 @@ def RunMash(R1, R2):
         AnalyzeMashTopHit("mashreport.tab")
         return 0
 
-    errorcode1 = call("mash screen -w -p 4 %s %s %s | sort -gr - | head > mashreport.tab" % (MASH_REFSEQ_SKETCH, R1, R2), shell=True)
+    errorcode1 = call("mash screen -w -p 4 %s %s %s | sort -gr - > mashreport.tab" % (MASH_REFSEQ_SKETCH, R1, R2), shell=True)
     AnalyzeMashTopHit("mashreport.tab")
 
 def ReadMashTopHit(mashreport):
