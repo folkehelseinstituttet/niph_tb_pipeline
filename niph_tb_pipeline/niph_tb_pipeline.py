@@ -17,7 +17,7 @@
 To avoid harmful shell injection, do assert no spaces in any files. NO files are allowed to contain space
 
 CURRENT PROBLEMS:
-NONE?
+SWITCH TO MASH INSTEAD OF KAIJU?
 '''
 import os
 import sys
@@ -35,6 +35,7 @@ KAIJU_NODES_DMP = "/mnt/kaijudb/nodes.dmp"
 KAIJU_DB_DMI = "/mnt/kaijudb/kaiju_db_nr.fmi"
 KAIJU_NAMES_DMP = "/mnt/kaijudb/names.dmp"
 KAIJU_BIN = "/opt/kaiju/bin"
+MASH_REFSEQ_SKETCH = "/mnt/mash/refseq.genomes.k21s1000.msh"
 TB_REF = "/mnt/Reference/M_tuberculosis_H37Rv.gb"
 TB_EXCLUDECOLS = "/mnt/Reference/Trimal_excludecolumns.txt"
 #MCCORTEX31_PATH = "/opt/Mykrobe-predictor/mccortex/bin/mccortex31"
@@ -95,15 +96,26 @@ def FindReads():
 def ReadSummary(summary):
     try:
         with open(summary,"rU") as f:
-            myf = f.read()
-            if myf[:4] == "PASS":
-                return 0
-            elif myf[:4] == "WARN":
-                return 1
-            elif myf[:4] == "FAIL":
-                return 2
-            else:
+            myf = csv.reader(f,delimiter="\t")
+            fastqcdic = {line[1]: line[0] for line in myf}
+            try:
+                if fastqcdic["Per sequence quality scores"] == "FAIL":
+                    return 2
+                elif fastqcdic["Per sequence quality scores"] == "WARN"
+                    return 1
+                else:
+                    return 0
+            except KeyError:
                 return -1
+
+            #if myf[:4] == "PASS":
+            #    return 0
+            #elif myf[:4] == "WARN":
+            #    return 1
+            #elif myf[:4] == "FAIL":
+            #    return 2
+            #else:
+            #    return -1
     except FileNotFoundError:
         return -1
 
@@ -145,7 +157,14 @@ def RunFastQC(R1, R2):
     R2info = ReadSummary(R2sum)
     if R1info != 0 or R2info != 0:
         # The presence of a Fastqc_problems file indicates a problem with the sequence data
-        open("Fastqc_problems","w")
+        out = open("Fastqc_problems","w")
+        if (R1info == 2 or R2info == 2):
+            out.write("Error rate > 1%")
+        elif (R1info == 1 or R2info == 1):
+            out.write("Error rate > .2%")
+        else:
+            out.write("Problem reading FastQC file")
+        out.close()
 
 def splitKaijuReportLine(line):
     linelist = line.split("\t")
@@ -195,22 +214,52 @@ def RunKaiju(R1, R2):
     AnalyzeKaijuReport("kaiju.summary")
 
 def RunMash(R1, R2):
-    '''Convert species identification to MASH instead. NOT USED'''
+    '''Convert species identification to MASH instead.'''
     print("Checking species ID with MASH")
     if os.path.isfile("mashreport.tab"):
         print("Mash results already exists in %s" % os.getcwd())
+        AnalyzeMashTopHit("mashreport.tab")
         return 0
 
-    errorcode1 = call("cat %s %s | mash screen -p 4 %s | sort -gr - | head > mashreport.tab" % (R1, R2, MASH_DB), shell=True)
-    with open("mashreport.tab","rU") as mf:
+    errorcode1 = call("mash screen -w -p 4 %s %s %s | sort -gr - | head > mashreport.tab" % (MASH_REFSEQ_SKETCH, R1, R2), shell=True)
+    AnalyzeMashTopHit("mashreport.tab")
+
+def ReadMashTopHit(mashreport):
+    # NOT USED
+    with open(mashreport,"rU") as mf:
         data = csv.reader(mf, delimiter="\t")
         tophit = next(data)
         topmatch = CaptureMashHit(tophit[5])
 
     return topmatch
 
+def SplitMashReportLine(line):
+    pattern = "[A-Z][a-z]* [a-z]*( strain)?( BCG)?(-1)?( subsp\. \w+)?( phiX174)?"
+    return {"identity": line[0], "sharedhashes":line[1], "medianmultiplicity":line[2], "pvalue":line[3], "queryid":line[4],"querycomment":line[5], "species": re.search(pattern,line[5])[0]}
+
+def AnalyzeMashTopHit(myfile):
+    with open(myfile, "rU") as mf:
+        content = csv.reader(mf,delimiter="\t")
+        mostcontent = SplitMashReportLine(next(data))
+        runnerup = SplitMashReportLine(next(data))
+        # Switch it up if phiX is top hit
+        if "Enterobacteria phage phiX174" in mostcontent["species"]:
+            mostcontent, runnerup = runnerup, mostcontent
+
+        if "Mycobacterium" not in mostcontent["species"]:
+            of = open("Mashclassificationproblem","w")
+            of.write(mostcontent["species"] + "\n")
+            of.close()
+        else:
+            if "Mycobacterium tuberculosis" not in mostcontent["species"]:
+                of = open("Mashothermycobacterium","w")
+                of.write(mostcontent["species"] + "\n")
+                of.close()
+        # ELSE: Do not write any files. Top species is MTB. Runner-up info not used (No contamination screen)
+
+
 def CaptureMashHit(string):
-    '''Method for capturing a binomial name from MASH screen results. NOT USED'''
+    '''Method for capturing a binomial name from MASH screen results.'''
     pattern = "[A-Z][a-z]* [a-z]*( strain)?( BCG)?(-1)?( subsp\. \w+)?"
     match = re.search(pattern,string)[0]
     return match
@@ -288,7 +337,8 @@ def sampleAnalysis(sample):
         sys.exit("Could not proceed because some file names contain space. Check %s and %s" % (myfiles["R1"], myfiles["R2"]))
 
     RunFastQC(myfiles["R1"], myfiles["R2"])
-    RunKaiju(myfiles["R1"], myfiles["R2"])
+    #RunKaiju(myfiles["R1"], myfiles["R2"])
+    RunMash(myfiles["R1", myfiles["R2"]])
     RunSnippy(myfiles["R1"], myfiles["R2"])
     FindCoverage()
     CleanupSnippyData()
@@ -599,7 +649,7 @@ def NumberRelated(sample, dists):
 
 
 
-def FinalizeSampleReport(sample, metainfo, resdic, clusterjanei, lineage, species, relationtoothers, covdicsample):
+def FinalizeSampleReport(sample, metainfo, resdic, clusterjanei, lineage, species, speciesmash, relationtoothers, covdicsample):
     '''Runs TeX scripts to actually create the report. Needs to be amended due to no write access to GLOBAL_COLLECTION'''
     try:
         os.chdir("./%s" % (sample))
@@ -612,7 +662,7 @@ def FinalizeSampleReport(sample, metainfo, resdic, clusterjanei, lineage, specie
     call("cp NeighborTreeWhite.png Latex_template/imageFiles/tree.png",shell=True)
 
     # Run TB-finalizer to create tex files
-    Tex_finalizer.CreateReport(metainfo, resdic, clusterjanei, lineage, species, relationtoothers, covdicsample)
+    Tex_finalizer.CreateReport(metainfo, resdic, clusterjanei, lineage, species, speciesmash, relationtoothers, covdicsample)
     # Create the pdf
     try:
         os.chdir("Latex_template")
@@ -722,13 +772,14 @@ def main():
         #lin = GetLineage('%s/mykrobe_output.tsv' % sample)
         lin = GetLineageColl("%s/colltype.txt" % sample)
         species = GetSpeciesMykrobe('%s/mykrobe_output.tsv' % sample)
+        speciesmash = ReadMashTopHit("%s/mashreport.tab" % sample)
 
         # Find out if sample is part of a cluster.
         # Lowest distance is always to self (0)
         relationtoothers = NumberRelated(sample, usedists[sample])
         clusterjanei = relationtoothers["somewhat"] > 0
 
-        FinalizeSampleReport(sample, metainfodic[sample], pimpedresdic, clusterjanei, lin, species, relationtoothers, covdic[sample])
+        FinalizeSampleReport(sample, metainfodic[sample], pimpedresdic, clusterjanei, lin, species, speciesmash, relationtoothers, covdic[sample])
 
         # Finally, copy data that goes to global directory/reports
         CopyForEasyGlobalDirMove(sample)

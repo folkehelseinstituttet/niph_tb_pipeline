@@ -22,8 +22,15 @@ def CreateInfo(metainfo, covdicsample):
     percentage_aligned = covdicsample["ALIGNED"] / (covdicsample["LENGTH"] - covdicsample["MASKED"]) * 100
     percentage_lowqual = covdicsample["LOWCOV"] / (covdicsample["LENGTH"] - covdicsample["MASKED"])
 
-    if os.path.isfile("Fastqc_problems"):
-        DataQual = "Lav output"
+    if os.path.isfile("averagedepth.txt"):
+        with open("averagedepth.txt", "rU") as rdfile:
+            RD = rdfile.readlines()[0].rstrip("\n")
+            RD = float(RD)
+    else:
+        RD = 0.0
+
+    if RD < 30.0:
+        DataQual = "Lav dybde"
     elif os.path.isfile("Kaijuclassificationproblem"):
         DataQual = "Ikke MTB"
     elif os.path.isfile("Kaijuothermycobacterium"):
@@ -33,6 +40,8 @@ def CreateInfo(metainfo, covdicsample):
     #elif covdicsample < 90.00:
     elif percentage_aligned < 90.00:
         DataQual = "Lav ref. coverage"
+    elif os.path.isfile("Fastqc_problems"):
+        DataQual = "Lav kvalitet"
     else:
         DataQual = "OK"
 
@@ -42,12 +51,7 @@ def CreateInfo(metainfo, covdicsample):
     LocatedFrom = metainfo["Source"]
     Isolationdate = metainfo["Isolated"]
 
-    if os.path.isfile("averagedepth.txt"):
-        with open("averagedepth.txt", "rU") as rdfile:
-            RD = rdfile.readlines()[0].rstrip("\n")
-            RD = float(RD)
-    else:
-        RD = 0.0
+
 
     infostring = '''
     ID for pr\\o ve    &  {SampleName}    & Perc. aligned          & {percentage_aligned:.2f}           \\\ \hline
@@ -355,7 +359,7 @@ Pipeline & {pipeline} & Referansegenom & {ref} \\\ \hline
     with open("Latex_template/include/pipelinedetaljer.tex","w") as outfile:
         outfile.write(text)
 
-def CreateReport(metainfo, resdic, clusterjanei, lineage, species, relationtoothers, covdicsample):
+def CreateReport(metainfo, resdic, clusterjanei, lineage, species, speciesmash, relationtoothers, covdicsample):
     CreateFooter(metainfo)
     CreateInfo(metainfo, covdicsample)
     CreateOppsummering(resdic, clusterjanei, species)
