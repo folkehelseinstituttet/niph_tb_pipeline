@@ -101,7 +101,7 @@ def ReadSummary(summary):
             try:
                 if fastqcdic["Per sequence quality scores"] == "FAIL":
                     return 2
-                elif fastqcdic["Per sequence quality scores"] == "WARN"
+                elif fastqcdic["Per sequence quality scores"] == "WARN":
                     return 1
                 else:
                     return 0
