@@ -240,8 +240,8 @@ def SplitMashReportLine(line):
 def AnalyzeMashTopHit(myfile):
     with open(myfile, "rU") as mf:
         content = csv.reader(mf,delimiter="\t")
-        mostcontent = SplitMashReportLine(next(data))
-        runnerup = SplitMashReportLine(next(data))
+        mostcontent = SplitMashReportLine(next(content))
+        runnerup = SplitMashReportLine(next(content))
         # Switch it up if phiX is top hit
         if "Enterobacteria phage phiX174" in mostcontent["species"]:
             mostcontent, runnerup = runnerup, mostcontent
