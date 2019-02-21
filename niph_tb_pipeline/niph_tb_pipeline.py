@@ -612,7 +612,7 @@ def GetLineage(mykrobetsvfile):
 def GetSpeciesMykrobe(mykrobetsvfile):
     '''Get species from Mykrobe predictor'''
     with open(mykrobetsvfile, "rU") as infile:
-        data = csv.reader(infile,delimiter="\t")
+        data = csv.reader(infile,delimiter=",")
         header = next(data)
         speciescol = header.index('species')
         binomial_name = re.sub("_"," ", next(data)[speciescol])
