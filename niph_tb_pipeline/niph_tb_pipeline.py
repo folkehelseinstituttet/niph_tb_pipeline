@@ -306,7 +306,7 @@ def CleanupSnippyData():
 
 def RunMykrobe(R1, R2, sampleName):
     # Check if mykrobe predictor results already exists:
-    if os.path.isfile("mykrobe_output.tsv"):
+    if os.path.isfile("mykrobe_output.csv"):
         print("Mykrobe predictor results already exists in %s" % os.getcwd())
         return 0
     #errorcode1 = call("mykrobe predict %s tb --mccortex31_path %s -1 %s %s > mykrobe_output.json" % (sampleName, MCCORTEX31_PATH, R1, R2), shell=True)
@@ -581,7 +581,7 @@ def HandleMutation(mutation):
 
 def PimpResDic(mykrobetsvfile):
     with open(mykrobetsvfile, "rU") as infile:
-        data = csv.reader(infile, delimiter="\t")
+        data = csv.reader(infile, delimiter=",")
         header = next(data)
         drugcol = header.index('drug')
         mutcol = [ i for i, word in enumerate(header) if word.startswith('variant') ][0]
@@ -604,7 +604,7 @@ def GetLineage(mykrobetsvfile):
     LEGACY METHOD. NO LONGER USED.
     """
     with open(mykrobetsvfile, "rU") as infile:
-        data = csv.reader(infile,delimiter="\t")
+        data = csv.reader(infile,delimiter=",")
         header = next(data)
         lineagecol = header.index('lineage')
         return next(data)[lineagecol]
@@ -771,13 +771,13 @@ def main():
         MakeTree(sample, Neighbors, all_snps)
 
         # Pimp resdic
-        pimpedresdic = PimpResDic('%s/mykrobe_output.tsv' % sample)
+        pimpedresdic = PimpResDic('%s/mykrobe_output.csv' % sample)
 
         # Get lineage
         # Consider implementing COLL scheme instead
         #lin = GetLineage('%s/mykrobe_output.tsv' % sample)
         lin = GetLineageColl("%s/colltype.txt" % sample)
-        species = GetSpeciesMykrobe('%s/mykrobe_output.tsv' % sample)
+        species = GetSpeciesMykrobe('%s/mykrobe_output.csv' % sample)
         speciesmash = ReadMashTopHit("%s/mashreport.tab" % sample)
 
         # Find out if sample is part of a cluster.
