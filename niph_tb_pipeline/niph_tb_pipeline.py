@@ -18,6 +18,7 @@ To avoid harmful shell injection, do assert no spaces in any files. NO files are
 
 CURRENT PROBLEMS:
 SWITCH TO MASH INSTEAD OF KAIJU?
+ONLY SNIPPY OUTPUT IS WRITTEN TO STDOUT?
 '''
 import os
 import sys
@@ -87,10 +88,10 @@ def FindReads():
         assert re.match("^[\w_\-]+(R1_001\.fastq|R1\.fastq)", R1[0])
         assert re.match("^[\w_\-]+(R2_001\.fastq|R2\.fastq)", R2[0])
     except AssertionError:
-        print("Found %s and %s - Illegal characters in name" % (R1[0], R2[0]))
+        print("Found %s and %s - Illegal characters in name" % (R1[0], R2[0]), flush=True)
         sys.exit("Isolate names can only contain letters (a-z, A-Z), numbers (0-9), dash (-) and underscore (_)")
 
-    print("Found R1: %s, \t R2: %s" % (R1, R2))
+    print("Found R1: %s, \t R2: %s" % (R1, R2), flush=True)
     return {"R1": R1[0], "R2": R2[0]}
 
 def ReadSummary(summary):
@@ -142,11 +143,11 @@ def RunFastQC(R1, R2):
     R2sum = R2nosuf + "_fastqc/summary.txt"
     # Check if files exist already:
     if os.path.isfile(R1zip) and os.path.isfile(R2zip):
-        print("FastQC results already exists in %s" % (os.getcwd()))
+        print("FastQC results already exists in %s" % (os.getcwd()), flush=True)
         return 0
     
     # Run FastQC
-    print("Running cmd: fastqc %s %s in dir %s" % (R1, R2, os.getcwd()))
+    print("Running cmd: fastqc %s %s in dir %s" % (R1, R2, os.getcwd()), flush=True)
     errorcode = call("fastqc --extract %s %s" % (R1, R2), shell=True)
     if errorcode != 0:
         sys.exit("FastQC did not complete correctly.")
@@ -215,13 +216,11 @@ def RunKaiju(R1, R2):
 
 def RunMash(R1, R2):
     '''Convert species identification to MASH instead.'''
-    print("Checking species ID with MASH")
+    print("Checking species ID with MASH", flush=True)
     if os.path.isfile("mashreport.tab"):
-        print("Mash results already exists in %s" % os.getcwd())
+        print("Mash results already exists in %s" % os.getcwd(), flush=True)
         AnalyzeMashTopHit("mashreport.tab")
         return 0
-
-    print("CMD: mash screen -w -p 4 %s %s %s > mashreport.tab" % (MASH_REFSEQ_SKETCH, R1, R2))
 
     errorcode1 = call("mash screen -w -p 4 %s %s %s > mashreport.tab" % (MASH_REFSEQ_SKETCH, R1, R2), shell=True)
     errorcode2 = call("sort -gr mashreport.tab > mashreport.sorted.tab", shell=True)
@@ -273,14 +272,14 @@ def CaptureMashHit(string):
 def RunSnippy(R1, R2):
     # Check if snippy dir exists already:
     if os.path.isdir("snippy"):
-        print("Snippy results already exits in %s" % os.getcwd())
+        print("Snippy results already exits in %s" % os.getcwd(), flush=True)
         return 0
     errorcode = call("snippy --outdir ./snippy --ref %s --R1 %s --R2 %s" % (TB_REF, R1, R2), shell=True) # REMOVED --cleanup (Needed for samtools depth - Remove BAM files later in script)
 
 def FindCoverage():
-    print("Checking coverage")
+    print("Checking coverage", flush=True)
     if os.path.isfile("averagedepth.txt"):
-        print("Average depth already calculated")
+        print("Average depth already calculated", flush=True)
         return 0
     #errorcode = call("gzip -cd snippy/snps.depth.gz | awk '{sum+=$3; sumsq+=$3*$3} END { print sum/NR; print sqrt(sumsq/NR - (sum/NR)**2)}' > averagedepth.txt", shell=True)
     errorcode1 = call("samtools depth -aa snippy/snps.bam > snippy/snps.depth", shell=True)
@@ -288,9 +287,9 @@ def FindCoverage():
     errorcode2 = call("cat snippy/snps.depth | awk '{sum+=$3} END { print sum/NR}' > averagedepth.txt", shell=True)
 
 def CleanupSnippyData():
-    print("Cleaning up snippy data")
+    print("Cleaning up snippy data", flush=True)
     if not os.path.isdir("snippy/reference/ref/"):
-        print("Snippy data already cleaned up")
+        print("Snippy data already cleaned up", flush=True)
         return 0
     errorcode1 = call("rm -rf snippy/reference/ref/", shell=True)
     errorcode2 = call("rm -rf snippy/reference/genomes/", shell=True)
@@ -307,7 +306,7 @@ def CleanupSnippyData():
 def RunMykrobe(R1, R2, sampleName):
     # Check if mykrobe predictor results already exists:
     if os.path.isfile("mykrobe_output.csv"):
-        print("Mykrobe predictor results already exists in %s" % os.getcwd())
+        print("Mykrobe predictor results already exists in %s" % os.getcwd(), flush=True)
         return 0
     #errorcode1 = call("mykrobe predict %s tb --mccortex31_path %s -1 %s %s > mykrobe_output.json" % (sampleName, MCCORTEX31_PATH, R1, R2), shell=True)
     errorcode1 = call("mykrobe predict %s tb --output mykrobe_output.csv --format csv -1 %s %s" % (sampleName, R1, R2), shell=True)
@@ -318,9 +317,9 @@ def RunMykrobe(R1, R2, sampleName):
         errorcode4 = call("rm mykrobe_output.json",shell=True)
 
 def CollType():
-    print("Typing according to Coll (2014) scheme")
+    print("Typing according to Coll (2014) scheme", flush=True)
     if os.path.isfile("colltype.txt"):
-        print("Coll type already calculated")
+        print("Coll type already calculated", flush=True)
         return 0
     #errorcode = call("colltyper -o colltype.txt snippy/snps.vcf", shell=True)
     # USE unfiltered VCF file to find mixed infections
@@ -329,12 +328,12 @@ def CollType():
 def sampleAnalysis(sample):
     
     sampleName = FindSampleName(sample)
-    print("Sample name: %s" % sampleName)
+    print("Sample name: %s" % sampleName, flush=True)
     try:
         os.chdir(sample)
     except:
         sys.exit("Could not access dir: %s" % sample)
-    print("Current dir: %s " % os.getcwd())
+    print("Current dir: %s " % os.getcwd(), flush=True)
     myfiles = FindReads()
     try:
         assert ' ' not in myfiles["R1"]
@@ -440,7 +439,7 @@ def RunSnippyCore(basedir, timestamp):
     #    os.chdir(GLOBAL_COLLECTION)
     #except:
     #    sys.exit("Unable to move to global collection dir: %s" % GLOBAL_COLLECTION)
-    print("Running snippy-core")
+    print("Running snippy-core", flush=True)
 
     dirs = next(os.walk(basedir))[1]
     dirs.remove("COPY_TO_REPORTS")
@@ -458,7 +457,7 @@ def RunSnippyCore(basedir, timestamp):
             errorcode1 = call("snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa %s %s 2> snippy-core.log" % (timestamp, globaldirstxt, dirs), shell=True)
         except:
             #print("Command failed: snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa --mask=/mnt/Reference/Trimal_excludecolumns.bed %s %s 2> snippy-core.log" % (timestamp, globaldirstxt, dirs))
-            print("Command failed: snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa %s %s 2> snippy-core.log" % (timestamp, globaldirstxt, dirs))
+            print("Command failed: snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa %s %s 2> snippy-core.log" % (timestamp, globaldirstxt, dirs), flush=True)
             sys.exit("Snippy-core failed for unknown reason. See snippy-core log file")
     # Mask bad regions in full alignment
     # (LEGACY) (No longer needed since snippy-core can do this automatically) NOTE - NOT TRUE - STILL USE
@@ -492,7 +491,7 @@ def RunSnippyCore(basedir, timestamp):
 def ReadSnippyCoreLog():
     """ LEGACY method. Reads snippy-core log to get % coverage"""
     with open("snippy-core.log","rU") as snippycorelogfile:
-        print("Reading snippy-core log")
+        print("Reading snippy-core log", flush=True)
         snippyloglines = snippycorelogfile.readlines()
         covdic = {}
         for l in snippyloglines:
@@ -507,7 +506,7 @@ def ReadSnippyCoreLog():
 def ReadSnippyCoreCov(timestamp):
     """ NEW method for getting % cov from snippy-core. Uses .txt file"""
     with open("TB_all_%s.txt" % (timestamp), "rU") as txtfile:
-        print("Reading coverage information")
+        print("Reading coverage information", flush=True)
         data = csv.reader(txtfile, delimiter="\t")
         header = next(data)
         #covdickeys = {key:i for i,key in enumerate(header)}
@@ -518,7 +517,7 @@ def ReadSnippyCoreCov(timestamp):
 
 def RunSnpDists():
     ''' Should be based on FULL alignment (with masked regions) rather than post snp-dists version'''
-    print("Finding distances between all isolates in global collection")
+    print("Finding distances between all isolates in global collection", flush=True)
     errorcode = call("snp-dists -c TB_all*.masked.fasta > TB_all_dists.csv", shell=True)
 
 def ReadSnpDistsObject(dists):
@@ -684,12 +683,12 @@ def FinalizeSampleReport(sample, metainfo, resdic, clusterjanei, lineage, specie
         sys.exit("Unable to move back from directory %s" % sample)
 
 def main():
-    print("Starting")
+    print("Starting", flush=True)
     # Verify that Metadata.csv exists
     metadataexists = True
     if not os.path.isfile("Metadata.csv"):
         metadataexists = False
-        print("WARNING: Unable to locate Metadata.csv in root directory")
+        print("WARNING: Unable to locate Metadata.csv in root directory", flush=True)
 
     basedir = os.getcwd()
     timestamp = time.strftime("%d_%b_%Y")
@@ -711,7 +710,7 @@ def main():
             continue
         if "COPY_TO_REPORTS" in sample:
             continue
-        print("Running sample %s" % sample)
+        print("Running sample %s" % sample, flush=True)
 
         sampleAnalysis(sample)
 
@@ -724,20 +723,20 @@ def main():
     RunSnpDists()
     # For each sample, find the 20 closest and draw a FastTree
     with open("TB_all_dists.csv","rU") as distfile:
-        print("Reading distances between all isolates in global collection")
+        print("Reading distances between all isolates in global collection", flush=True)
         dists = csv.reader(distfile, delimiter=",")
         usedists = ReadSnpDistsObject(dists)
 
     # Load Biopython alignment of all snps
     with open("TB_all_%s.aln" % timestamp, "rU") as snpfile:
-        print("Loading global alignment of SNPs")
+        print("Loading global alignment of SNPs", flush=True)
         all_snps = Bio.AlignIO.read(snpfile, "fasta")
 
     
     # Load sample metadata
     if metadataexists:
         with open("Metadata.csv","rU") as metainfofile:
-            print("Loading metadata")
+            print("Loading metadata", flush=True)
             metainfo = csv.reader(metainfofile,delimiter=",")
             metainfodic = {}
             header = next(metainfo)
@@ -764,7 +763,7 @@ def main():
 
     covdic = ReadSnippyCoreCov(timestamp)
 
-    print("Finalizing reports for each strain")
+    print("Finalizing reports for each strain", flush=True)
 
     for sample in dirs:
         Neighbors = FindNeighbors(usedists[sample], NUMBER_NEIGHBORS_IN_TREE)
