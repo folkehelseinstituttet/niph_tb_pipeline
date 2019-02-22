@@ -436,7 +436,7 @@ def MaskRepetitiveRegions(alnfile):
     return outfilename
 
 def replaceOldSNPalignment(maskedfile, filetoreplace):
-	print("Replacing SNP alignment from snippy-core with one from a MASKED whole-genome alignment",flush=True)
+    print("Replacing SNP alignment from snippy-core with one from a MASKED whole-genome alignment",flush=True)
     call("snp-sites -o %s %s" % (filetoreplace, maskedfile), shell=True)
 
 
