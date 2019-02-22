@@ -18,7 +18,9 @@ To avoid harmful shell injection, do assert no spaces in any files. NO files are
 
 CURRENT PROBLEMS:
 SWITCH TO MASH INSTEAD OF KAIJU?
-ONLY SNIPPY OUTPUT IS WRITTEN TO STDOUT?
+ONLY SNIPPY OUTPUT IS WRITTEN TO STDOUT? (SOLUTION - FLUSH EVERY PRINT STATEMENT)
+DEFINITELY SOME PROBLEMS COLLATING RESULTS FROM MASH/MYKROBE PROBABLY
+NEED TO REMOVE TMP DIRECTORY FROM MYKROBE? (OR NOT - IT TAKES 0KB)
 '''
 import os
 import sys
@@ -314,7 +316,9 @@ def RunMykrobe(R1, R2, sampleName):
     #errorcode3 = call("rm -rf atlas", shell=True)
     errorcode4 = call("rm -rf mykrobe", shell=True)
     if os.path.isfile("mykrobe_output.tsv"):
-        errorcode4 = call("rm mykrobe_output.json",shell=True)
+        errorcode5 = call("rm mykrobe_output.json",shell=True)
+    if os.path.isdir("tmp"):
+        errorcode6 = call("rm -rf tmp", shell=True)
 
 def CollType():
     print("Typing according to Coll (2014) scheme", flush=True)
