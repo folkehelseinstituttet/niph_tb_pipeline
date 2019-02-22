@@ -17,10 +17,12 @@
 To avoid harmful shell injection, do assert no spaces in any files. NO files are allowed to contain space
 
 CURRENT PROBLEMS:
-SWITCH TO MASH INSTEAD OF KAIJU?
-ONLY SNIPPY OUTPUT IS WRITTEN TO STDOUT? (SOLUTION - FLUSH EVERY PRINT STATEMENT)
-DEFINITELY SOME PROBLEMS COLLATING RESULTS FROM MASH/MYKROBE PROBABLY
-NEED TO REMOVE TMP DIRECTORY FROM MYKROBE? (OR NOT - IT TAKES 0KB)
+SWITCH TO MASH INSTEAD OF KAIJU? [X]
+ONLY SNIPPY OUTPUT IS WRITTEN TO STDOUT? (SOLUTION - FLUSH EVERY PRINT STATEMENT) [X]
+SOME PROBLEMS COLLATING RESULTS FROM MASH/MYKROBE PROBABLY [ ]
+NEED TO REMOVE TMP DIRECTORY FROM MYKROBE? (OR NOT - IT TAKES 0KB) [X]
+MAKE GLOBAL TREE MUCH SIMPLER TO CALCULATE. GTR / LIKELIHOOD TAKES TOO LONG WITH 1K+ ISOLATES - RAPIDNJ?
+
 '''
 import os
 import sys
@@ -477,8 +479,9 @@ def RunSnippyCore(basedir, timestamp):
         errorcode2 = call("rm TB_all_%s.full.aln" % timestamp, shell=True)
 
     # Create continuously evolving global tree
-    if not os.path.isfile("Global_collection_tree.nwk"):
-        errorcode3 = call("FastTree -nt -gtr TB_all_%s.aln > Global_collection_tree.nwk" % (timestamp), shell=True)
+    # REMOVE IN VERSION 0.9 - HAS BECOME TOO SLOW
+    #if not os.path.isfile("Global_collection_tree.nwk"):
+    #    errorcode3 = call("FastTree -nt -gtr TB_all_%s.aln > Global_collection_tree.nwk" % (timestamp), shell=True)
     
     # Remove masked file
     # (LEGACY) (No longer needed since Snippy-core does this)
@@ -527,10 +530,15 @@ def RunSnpDists():
 def ReadSnpDistsObject(dists):
     header = next(dists)[1:]
     res = {}
-    for row in dists:
-        res[row[0]] = {}
-        for i in range(len(header)):
-            res[row[0]][header[i]] = int(row[i+1])
+    with open("TB_all_dists.phylip","w") as phylipfile:
+        writer = csv.writer(phylipfile, delimiter="\t")
+        samplesindb = dists.line_num - 1
+        writer.writerow([str(samplesindb)])
+        for row in dists:
+            res[row[0]] = {}
+            writer.writerow(row)
+            for i in range(len(header)):
+                res[row[0]][header[i]] = int(row[i+1])
     return res
 
 def FindNeighbors(sampledists, threshold):
@@ -725,11 +733,18 @@ def main():
     
     RunSnippyCore(basedir, timestamp)
     RunSnpDists()
+
     # For each sample, find the 20 closest and draw a FastTree
     with open("TB_all_dists.csv","rU") as distfile:
         print("Reading distances between all isolates in global collection", flush=True)
         dists = csv.reader(distfile, delimiter=",")
         usedists = ReadSnpDistsObject(dists)
+
+    print("Writing NJ tree of all isolates in DB", flush=True)
+    try:
+        call("rapidnj TB_all_dists.phylip -i pd > Global_collection_tree.nwk", shell=True)
+    except:
+        print("Unable to write global collection tree", flush=True)
 
     # Load Biopython alignment of all snps
     with open("TB_all_%s.aln" % timestamp, "rU") as snpfile:

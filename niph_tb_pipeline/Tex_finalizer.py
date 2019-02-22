@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 ''' The script that finishes the TeX report. Called from TB_pipeline.py '''
 
@@ -31,12 +31,12 @@ def CreateInfo(metainfo, covdicsample):
 
     if RD < 30.0:
         DataQual = "Lav dybde"
-    elif os.path.isfile("Kaijuclassificationproblem"):
+    elif os.path.isfile("Mashclassificationproblem"):
         DataQual = "Ikke MTB"
-    elif os.path.isfile("Kaijuothermycobacterium"):
+    elif os.path.isfile("Mashothermycobacterium"):
         DataQual = "Annen mykobakterie"
-    elif os.path.isfile("Kaijucontaminationproblem"):
-        DataQual = "Mulig kontaminasjon"
+    #elif os.path.isfile("Kaijucontaminationproblem"):
+    #    DataQual = "Mulig kontaminasjon"
     #elif covdicsample < 90.00:
     elif percentage_aligned < 90.00:
         DataQual = "Lav ref. coverage"
