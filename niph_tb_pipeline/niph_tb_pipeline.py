@@ -436,6 +436,7 @@ def MaskRepetitiveRegions(alnfile):
     return outfilename
 
 def replaceOldSNPalignment(maskedfile, filetoreplace):
+	print("Replacing SNP alignment from snippy-core with one from a MASKED whole-genome alignment",flush=True)
     call("snp-sites -o %s %s" % (filetoreplace, maskedfile), shell=True)
 
 
@@ -470,9 +471,9 @@ def RunSnippyCore(basedir, timestamp):
     if os.path.isfile("TB_all_%s.full.aln" % timestamp):
         if not os.path.isfile("TB_all_%s.masked.fasta" % timestamp):
             maskedfile = MaskRepetitiveRegions("TB_all_%s.full.aln" % timestamp)
+            # Replace basic SNP alignment with masked FULL alignment
+            replaceOldSNPalignment("TB_all_%s.masked.fasta" % timestamp, "TB_all_%s.aln" % timestamp)
     
-    # Replace basic SNP alignment with masked FULL alignment
-    replaceOldSNPalignment("TB_all_%s.masked.fasta" % timestamp, "TB_all_%s.aln" % timestamp)
 
     # Discard whole-genome alignment
     if os.path.isfile("TB_all_%s.full.aln" % timestamp):
@@ -525,7 +526,10 @@ def ReadSnippyCoreCov(timestamp):
 def RunSnpDists():
     ''' Should be based on FULL alignment (with masked regions) rather than post snp-dists version'''
     print("Finding distances between all isolates in global collection", flush=True)
-    errorcode = call("snp-dists -c TB_all*.masked.fasta > TB_all_dists.csv", shell=True)
+    if not os.path.isfile("TB_all_dists.csv"):
+        errorcode = call("snp-dists -c TB_all*.masked.fasta > TB_all_dists.csv", shell=True)
+    else:
+        print("Dists file already exists.", flush=True)
 
 def ReadSnpDistsObject(dists):
     header = next(dists)[1:]

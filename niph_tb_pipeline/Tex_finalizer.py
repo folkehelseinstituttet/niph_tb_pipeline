@@ -25,7 +25,10 @@ def CreateInfo(metainfo, covdicsample):
     if os.path.isfile("averagedepth.txt"):
         with open("averagedepth.txt", "rU") as rdfile:
             RD = rdfile.readlines()[0].rstrip("\n")
-            RD = float(RD)
+            try:
+                RD = float(RD)
+            except NameError:
+                RD = 0.0
     else:
         RD = 0.0
 
