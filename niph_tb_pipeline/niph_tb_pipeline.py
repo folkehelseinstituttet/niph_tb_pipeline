@@ -524,10 +524,13 @@ def ReadSnippyCoreCov(timestamp):
         return covdic
 
 def RunSnpDists():
-    ''' Should be based on FULL alignment (with masked regions) rather than post snp-dists version'''
+    ''' Should be based on FULL alignment (with masked regions) rather than post snp-sites version. 
+    NOTE. Apparently, as of snp-dists 0.6.3, results are the same. Does Ns not matter anymore?
+    '''
     print("Finding distances between all isolates in global collection", flush=True)
     if not os.path.isfile("TB_all_dists.csv"):
-        errorcode = call("snp-dists -c TB_all*.masked.fasta > TB_all_dists.csv", shell=True)
+        #errorcode = call("snp-dists -c TB_all*.masked.fasta > TB_all_dists.csv", shell=True)
+        errorcode = call("snp-dists -c TB_all*.aln > TB_all_dists.csv", shell=True)
     else:
         print("Dists file already exists.", flush=True)
 
@@ -536,13 +539,18 @@ def ReadSnpDistsObject(dists):
     res = {}
     with open("TB_all_dists.phylip","w") as phylipfile:
         writer = csv.writer(phylipfile, delimiter="\t")
-        samplesindb = dists.line_num - 1
-        writer.writerow([str(samplesindb)])
+        stufftowrite = []
+        #samplesindb = dists.line_num - 1
+        #writer.writerow([str(samplesindb)])
         for row in dists:
             res[row[0]] = {}
-            writer.writerow(row)
+            #writer.writerow(row)
+            stufftowrite.append(row)
             for i in range(len(header)):
                 res[row[0]][header[i]] = int(row[i+1])
+        samplesindb = len(stufftowrite)
+        writer.writerow([str(samplesindb)])
+        writer.writerows(stufftowrite)
     return res
 
 def FindNeighbors(sampledists, threshold):
