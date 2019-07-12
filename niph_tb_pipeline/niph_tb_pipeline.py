@@ -17,11 +17,9 @@
 To avoid harmful shell injection, do assert no spaces in any files. NO files are allowed to contain space
 
 CURRENT PROBLEMS:
-SWITCH TO MASH INSTEAD OF KAIJU? [X]
-ONLY SNIPPY OUTPUT IS WRITTEN TO STDOUT? (SOLUTION - FLUSH EVERY PRINT STATEMENT) [X]
-SOME PROBLEMS COLLATING RESULTS FROM MASH/MYKROBE PROBABLY [ ]
-NEED TO REMOVE TMP DIRECTORY FROM MYKROBE? (OR NOT - IT TAKES 0KB) [X]
 MAKE GLOBAL TREE MUCH SIMPLER TO CALCULATE. GTR / LIKELIHOOD TAKES TOO LONG WITH 1K+ ISOLATES - RAPIDNJ?
+Qinolones not displayed properly with new Mykrobe version!
+"Variants" field in report messed up sometimes? Few variants when clearly more in VCF
 
 '''
 import os
