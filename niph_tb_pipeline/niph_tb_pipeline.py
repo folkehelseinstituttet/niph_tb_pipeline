@@ -17,9 +17,9 @@
 To avoid harmful shell injection, do assert no spaces in any files. NO files are allowed to contain space
 
 CURRENT PROBLEMS:
-MAKE GLOBAL TREE MUCH SIMPLER TO CALCULATE. GTR / LIKELIHOOD TAKES TOO LONG WITH 1K+ ISOLATES - RAPIDNJ?
-Qinolones not displayed properly with new Mykrobe version!
-"Variants" field in report messed up sometimes? Few variants when clearly more in VCF
+[X] Consider changing min expected coverage for mykrobe predict. 0.3 too strict! 0.15?
+[X] Qinolones not displayed properly with new Mykrobe version!
+[?] "Variants" field in report messed up sometimes? Few variants when clearly more in VCF
 
 '''
 import os
@@ -311,7 +311,7 @@ def RunMykrobe(R1, R2, sampleName):
         print("Mykrobe predictor results already exists in %s" % os.getcwd(), flush=True)
         return 0
     #errorcode1 = call("mykrobe predict %s tb --mccortex31_path %s -1 %s %s > mykrobe_output.json" % (sampleName, MCCORTEX31_PATH, R1, R2), shell=True)
-    errorcode1 = call("mykrobe predict %s tb --output mykrobe_output.csv --format csv -1 %s %s" % (sampleName, R1, R2), shell=True)
+    errorcode1 = call("mykrobe predict %s tb --output mykrobe_output.csv --format csv --min_proportion_expected_depth 0.15 -1 %s %s" % (sampleName, R1, R2), shell=True)
     #errorcode2 = call("json_to_tsv mykrobe_output.json > mykrobe_output.tsv", shell=True)
     #errorcode3 = call("rm -rf atlas", shell=True)
     errorcode4 = call("rm -rf mykrobe", shell=True)
@@ -617,6 +617,9 @@ def PimpResDic(mykrobetsvfile):
                 # Can have multiple mutations split by ;
                 muts = mutation.split(';')
                 resistensdic[row[drugcol]] = ', '.join([HandleMutation(m) for m in muts])
+        # Convert individual quinolone results to just quinolones as group
+        if "Moxifloxacin" in resistensdic:
+            resistensdic["Quinolones"] = resistensdic["Moxifloxacin"]
 
         return resistensdic
 
