@@ -132,6 +132,10 @@ def TwoLineagesMix(i,j):
     # Add catch for BOV and BOV\\_AFRI
     if "BOV" in i and "BOV" in j:
         return False
+    if "BOV" in i and ("5" in j or "6" in j):
+        return False
+    if ("5" in j or "6" in j) and "BOV" in j:
+        return False
     isplit = i.split('.')
     jsplit = j.split('.')
     largest = max(len(isplit),len(jsplit))

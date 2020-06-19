@@ -590,9 +590,8 @@ def HandleMutation(mutation):
     mut = mutation.split(':')[0]
     if mut.count('-') > 1:
         # Promotor mutation
-        mutation = ''.join(mutation.split('-')[:-1])
+        mutation = '-'.join(mutation.split('-')[:-1])
         mutation = mutation.replace('_',' (') + ')'
-        mutation = mutation.replace('-','')
         return mutation
     else:
         # Protein mutation
@@ -640,6 +639,9 @@ def GetSpeciesMykrobe(mykrobetsvfile):
         header = next(data)
         speciescol = header.index('species')
         binomial_name = re.sub("_"," ", next(data)[speciescol])
+        if binomial_name == "Mycobacterium_bovis":
+            lineagecol = header.index('lineage')
+            binomial_name = re.sub("_", " ", next(data)[lineagecol])
         return binomial_name
 
 def GetLineageColl(colltyperfile):
