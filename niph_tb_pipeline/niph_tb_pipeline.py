@@ -75,25 +75,30 @@ def FindReads():
         R1 = [s for s in files if "R1.fastq" in s]
         R2 = [s for s in files if "R2.fastq" in s]
     if len(R1) > 1 or len(R2) > 1:
-        print("WARNING: More than one file matches 'R1_001.fastq' or 'R2_001.fastq'")
-        # Check if nextseq reads. Same stem but different lane
-        R1sort = sorted(R1)
-        R2sort = sorted(R2)
-        stem1 = [re.findall("(.+)_L00\d",s) for s in R1sort]
-        stem2 = [re.findall("(.+)_L00\d",s) for s in R2sort]
-        try:
-            assert all(elem == stem1[0] for elem in stem1)
-            assert all(elem == stem2[0] for elem in stem2)
-        except AssertionError:
-            sys.exit("Ambiguity error: Found reads for multiple different isolates: %s" % stem1)
-        try:
-            for i in range(len(R1sort)):
-                call("cat %s >> %s" % (R1sort[i], stem1[0][0] + "_merged_R1_001.fastq.gz"), shell=True)
-                call("cat %s >> %s" % (R2sort[i], stem2[0][0] + "_merged_R2_001.fastq.gz"), shell=True)
-            R1 = [stem1[0][0] + "_merged_R1_001.fastq.gz"]
-            R2 = [stem1[0][0] + "_merged_R2_001.fastq.gz"]
-        except:
-            sys.exit("ERROR: Couldnt concatenate reads from different lanes. Try doing this manually first.")
+        # If merged file exists - Use that
+        if any("merged" in elem for elem in R1):
+            R1 = [s for s in files if "merged_R1_001.fastq" in s]
+            R2 = [s for s in files if "merged_R2_001.fastq" in s]
+        else:
+            print("WARNING: More than one file matches 'R1_001.fastq' or 'R2_001.fastq'")
+            # Check if nextseq reads. Same stem but different lane
+            R1sort = sorted(R1)
+            R2sort = sorted(R2)
+            stem1 = [re.findall("(.+)_L00\d",s) for s in R1sort]
+            stem2 = [re.findall("(.+)_L00\d",s) for s in R2sort]
+            try:
+                assert all(elem == stem1[0] for elem in stem1)
+                assert all(elem == stem2[0] for elem in stem2)
+            except AssertionError:
+                sys.exit("Ambiguity error: Found reads for multiple different isolates: %s" % stem1)
+            try:
+                for i in range(len(R1sort)):
+                    call("cat %s >> %s" % (R1sort[i], stem1[0][0] + "_merged_R1_001.fastq.gz"), shell=True)
+                    call("cat %s >> %s" % (R2sort[i], stem2[0][0] + "_merged_R2_001.fastq.gz"), shell=True)
+                R1 = [stem1[0][0] + "_merged_R1_001.fastq.gz"]
+                R2 = [stem1[0][0] + "_merged_R2_001.fastq.gz"]
+            except:
+                sys.exit("ERROR: Couldnt concatenate reads from different lanes. Try doing this manually first.")
         try:
             assert R1[0] in os.listdir(".")
             assert R2[0] in os.listdir(".")
