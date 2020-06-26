@@ -87,7 +87,7 @@ def FindReads():
         except AssertionError:
             sys.exit("Ambiguity error: Found reads for multiple different isolates: %s" % stem1)
         try:
-            for i in len(R1sort):
+            for i in range(len(R1sort)):
                 call("cat %s >> %s" % (R1sort[i], stem1[0][0] + "_merged_R1_001.fastq.gz"), shell=True)
                 call("cat %s >> %s" % (R2sort[i], stem2[0][0] + "_merged_R2_001.fastq.gz"), shell=True)
             R1 = [stem1[0][0] + "_merged_R1_001.fastq.gz"]
