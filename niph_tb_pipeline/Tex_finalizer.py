@@ -75,7 +75,7 @@ def CreateInfo(metainfo, covdicsample):
     with open("Latex_template/include/info.tex","w") as outfile:
         outfile.write(infostringfull)
 
-def CreateOppsummering(resistens, clusterjanei, species):
+def CreateOppsummering(resistens, clusterjanei, species, mashspecies):
 
     if clusterjanei:
         smitte = 'Pr\\o ven tilh\\o rer et sannsynlig smittecluster, noe som antyder \\textbf{nylig smitte}. '
@@ -91,13 +91,13 @@ def CreateOppsummering(resistens, clusterjanei, species):
         alleres = ", ".join(["\\textbf{%s}" % r for r in reskeys[:-1]]) + " og \\textbf{%s}." % reskeys[-1]
         res = 'Det ble funnet mutasjoner som indikerer resistens mot {alleres} '.format(alleres=alleres)
 
-    if not os.path.isfile("Kaijuclassificationproblem"):
+    if not (os.path.isfile("Mashothermycobacterium") or os.path.isfile("Mashclassificationproblem")):
         oppsummering = 'Pr\\o ven var positiv for \\textbf{Mycobacterium tuberculosis-komplekset (MTC)}. %s %s ' % (res, smitte)
         tophit = species
-        oppsummering += 'Beste artstreff var \\textbf{%s} ' % species
+        oppsummering += 'Beste artstreff fra Mykrobe var \\textbf{%s}. Beste fra MASH var \\textbf{%s}. ' % (species, mashspecies)
     else:
-        tophit = open("Kaijuclassificationproblem","rU").read()
-        oppsummering = 'Pr\\o ven er ikke \\textbf{Mycobacterium tuberculosis}, men \\textbf{%s}. ' % tophit
+        tophit = open("Mashclassificationproblem","rU").read()
+        oppsummering = 'Pr\\o ven er ikke \\textbf{Mycobacterium tuberculosis}. Beste treff fra Mykrobe er \\textbf{%s} og fra MASH \\textbf{%s}. ' % (species, mashspecies)
     with open("Latex_template/include/oppsummering.tex","w") as outfile:
         outfile.write(oppsummering)
 
