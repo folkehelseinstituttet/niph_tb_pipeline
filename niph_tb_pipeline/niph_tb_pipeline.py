@@ -598,7 +598,7 @@ def MakeTree(sample, Neighbors, all_snps):
         if record.id == sample or record.id in Neighbors:
             templist.append(record)
     with open("Neighbors.aln","w") as outfile:
-        AlignIO.write(Align.MultipleSeqAlignment(records=templist,alphabet=Alphabet.SingleLetterAlphabet()), outfile, "fasta")
+        AlignIO.write(Align.MultipleSeqAlignment(records=templist), outfile, "fasta")
 
     errorcode1 = call("snp-sites -m -o Neighbors_SNPs.aln Neighbors.aln", shell=True)
     errorcode2 = call("FastTree -nt -gtr Neighbors_SNPs.aln > NeighborTree.nwk", shell=True)
