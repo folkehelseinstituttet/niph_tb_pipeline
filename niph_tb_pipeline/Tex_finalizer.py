@@ -95,8 +95,11 @@ def CreateOppsummering(resistens, clusterjanei, species, mashspecies):
         oppsummering = 'Pr\\o ven var positiv for \\textbf{Mycobacterium tuberculosis-komplekset (MTC)}. %s %s ' % (res, smitte)
         tophit = species
         oppsummering += 'Beste artstreff fra Mykrobe var \\textbf{%s}. Beste fra MASH var \\textbf{%s}. ' % (species, mashspecies)
-    else:
+    elif os.path.isfile("Mashclassificationproblem"):
         tophit = open("Mashclassificationproblem","rU").read()
+        oppsummering = 'Pr\\o ven er ikke i \\textbf{MTBC}. Beste treff fra Mykrobe er \\textbf{%s} og fra MASH \\textbf{%s}. ' % (species, mashspecies)
+    else:
+        tophit = open("Mashothermycobacterium","rU").read()
         oppsummering = 'Pr\\o ven er ikke \\textbf{Mycobacterium tuberculosis}. Beste treff fra Mykrobe er \\textbf{%s} og fra MASH \\textbf{%s}. ' % (species, mashspecies)
     with open("Latex_template/include/oppsummering.tex","w") as outfile:
         outfile.write(oppsummering)
