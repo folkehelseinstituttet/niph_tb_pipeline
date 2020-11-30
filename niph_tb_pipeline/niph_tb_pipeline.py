@@ -30,7 +30,7 @@ import re
 #import Bio
 import ete3
 from subprocess import Popen, PIPE, call
-from Bio import AlignIO, Align, Alphabet
+from Bio import AlignIO, Align
 from . import Tex_finalizer
 
 
