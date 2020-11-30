@@ -260,7 +260,6 @@ def RunMash(R1, R2):
     AnalyzeMashTopHit("mashreport.tab")
 
 def ReadMashTopHit(mashreport):
-    # NOT USED
     with open(mashreport,"rU") as mf:
         data = csv.reader(mf, delimiter="\t")
         tophit = next(data)
@@ -295,7 +294,7 @@ def AnalyzeMashTopHit(myfile):
 
 def CaptureMashHit(string):
     '''Method for capturing a binomial name from MASH screen results.'''
-    pattern = "[A-Z][a-z]* [a-z]*( strain)?( BCG)?(-1)?( subsp\. \w+)?"
+    pattern = "[A-Z][a-z]* [a-z]*( strain)?( BCG)?(-1)?( subsp\. \w+)?( phiX174)?"
     match = re.search(pattern,string)[0]
     return match
 
