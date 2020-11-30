@@ -369,7 +369,7 @@ Pipeline & {pipeline} & Referansegenom & {ref} \\\ \hline
 def CreateReport(metainfo, resdic, clusterjanei, lineage, species, speciesmash, relationtoothers, covdicsample):
     CreateFooter(metainfo)
     CreateInfo(metainfo, covdicsample)
-    CreateOppsummering(resdic, clusterjanei, species)
+    CreateOppsummering(resdic, clusterjanei, species, speciesmash)
     CreateTyping(lineage)
     CreateResistensBokser(resdic)
     CreateResistens(resdic)
