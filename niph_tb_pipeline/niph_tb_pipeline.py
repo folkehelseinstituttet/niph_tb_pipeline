@@ -27,10 +27,10 @@ import sys
 import time
 import csv
 import re
-import Bio
+#import Bio
 import ete3
 from subprocess import Popen, PIPE, call
-from Bio import AlignIO
+from Bio import AlignIO, Align, Alphabet
 from . import Tex_finalizer
 
 
@@ -598,7 +598,7 @@ def MakeTree(sample, Neighbors, all_snps):
         if record.id == sample or record.id in Neighbors:
             templist.append(record)
     with open("Neighbors.aln","w") as outfile:
-        Bio.AlignIO.write(Bio.Align.MultipleSeqAlignment(records=templist,alphabet=Bio.Alphabet.SingleLetterAlphabet()), outfile, "fasta")
+        AlignIO.write(Align.MultipleSeqAlignment(records=templist,alphabet=Alphabet.SingleLetterAlphabet()), outfile, "fasta")
 
     errorcode1 = call("snp-sites -m -o Neighbors_SNPs.aln Neighbors.aln", shell=True)
     errorcode2 = call("FastTree -nt -gtr Neighbors_SNPs.aln > NeighborTree.nwk", shell=True)
@@ -792,7 +792,7 @@ def main():
     # Load Biopython alignment of all snps
     with open("TB_all_%s.aln" % timestamp, "rU") as snpfile:
         print("Loading global alignment of SNPs", flush=True)
-        all_snps = Bio.AlignIO.read(snpfile, "fasta")
+        all_snps = AlignIO.read(snpfile, "fasta")
 
     
     # Load sample metadata
