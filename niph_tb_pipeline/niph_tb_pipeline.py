@@ -17,8 +17,6 @@
 To avoid harmful shell injection, do assert no spaces in any files. NO files are allowed to contain space
 
 CURRENT PROBLEMS:
-[X] Consider changing min expected coverage for mykrobe predict. 0.3 too strict! 0.15?
-[X] Qinolones not displayed properly with new Mykrobe version!
 [?] "Variants" field in report messed up sometimes? Few variants when clearly more in VCF
 
 '''
@@ -140,14 +138,6 @@ def ReadSummary(summary):
             except KeyError:
                 return -1
 
-            #if myf[:4] == "PASS":
-            #    return 0
-            #elif myf[:4] == "WARN":
-            #    return 1
-            #elif myf[:4] == "FAIL":
-            #    return 2
-            #else:
-            #    return -1
     except FileNotFoundError:
         return -1
 
@@ -179,7 +169,9 @@ def RunFastQC(R1, R2):
     
     # Run FastQC
     print("Running cmd: fastqc %s %s in dir %s" % (R1, R2, os.getcwd()), flush=True)
+    errorcode = call("source activate fastqc", shell=True)
     errorcode = call("fastqc --extract %s %s" % (R1, R2), shell=True)
+    errorcode = call("conda deactivate", shell=True)
     if errorcode != 0:
         sys.exit("FastQC did not complete correctly.")
 
@@ -810,18 +802,6 @@ def main():
         for sample in dirs:
             metainfodic[sample] = {"ID": sample, "Barcode":"","Location":"","Source":"","Isolated":""}
 
-    # with open("snippy-core.log","rU") as snippycorelogfile:
-    ## LEGACY - moved to ReadSnippyCoreLog
-    #     print("Reading snippy-core log")
-    #     snippyloglines = snippycorelogfile.readlines()
-    #     covdic = {}
-    #     for l in snippyloglines:
-    #         if "coverage" not in l:
-    #             continue
-    #         else:
-    #             l2 = l.split("\t")[1] # Get information part
-    #             l2s = l2.split(" ")
-    #             covdic[l2s[0]] = float(l2s[4][:-2]) # Remove % and \n
 
     covdic = ReadSnippyCoreCov(timestamp)
 
