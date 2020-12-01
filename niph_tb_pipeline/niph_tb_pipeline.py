@@ -169,9 +169,9 @@ def RunFastQC(R1, R2):
     
     # Run FastQC
     print("Running cmd: fastqc %s %s in dir %s" % (R1, R2, os.getcwd()), flush=True)
-    errorcode = call("source activate fastqc", shell=True)
+    #errorcode = call("source activate fastqc", shell=True)
     errorcode = call("fastqc --extract %s %s" % (R1, R2), shell=True)
-    errorcode = call("conda deactivate", shell=True)
+    #errorcode = call("conda deactivate", shell=True)
     if errorcode != 0:
         sys.exit("FastQC did not complete correctly.")
 
