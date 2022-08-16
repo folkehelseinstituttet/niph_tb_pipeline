@@ -703,7 +703,7 @@ def NumberRelated(sample, dists):
 
 
 
-def FinalizeSampleReport(sample, metainfo, resdic, clusterjanei, lineage, species, speciesmash, relationtoothers, covdicsample):
+def FinalizeSampleReport(sample, metainfo, resdic, clusterjanei, lineage, species, speciesmash, relationtoothers, covdicsample, samplesindb):
     '''Runs TeX scripts to actually create the report. Needs to be amended due to no write access to GLOBAL_COLLECTION'''
     try:
         os.chdir("./%s" % (sample))
@@ -716,7 +716,7 @@ def FinalizeSampleReport(sample, metainfo, resdic, clusterjanei, lineage, specie
     call("cp NeighborTreeWhite.png Latex_template/imageFiles/tree.png",shell=True)
 
     # Run TB-finalizer to create tex files
-    Tex_finalizer.CreateReport(metainfo, resdic, clusterjanei, lineage, species, speciesmash, relationtoothers, covdicsample)
+    Tex_finalizer.CreateReport(metainfo, resdic, clusterjanei, lineage, species, speciesmash, relationtoothers, covdicsample, samplesindb)
     # Create the pdf
     try:
         os.chdir("Latex_template")
