@@ -571,7 +571,7 @@ def ReadSnpDistsObject(dists):
         samplesindb = len(stufftowrite)
         writer.writerow([str(samplesindb)])
         writer.writerows(stufftowrite)
-    return res
+    return res, samplesindb
 
 def FindNeighbors(sampledists, threshold):
     Neighbors = []
@@ -775,7 +775,7 @@ def main():
     with open("TB_all_dists.csv","rU") as distfile:
         print("Reading distances between all isolates in global collection", flush=True)
         dists = csv.reader(distfile, delimiter=",")
-        usedists = ReadSnpDistsObject(dists)
+        usedists, samplesindb = ReadSnpDistsObject(dists)
 
     print("Writing NJ tree of all isolates in DB", flush=True)
     try:
@@ -828,7 +828,7 @@ def main():
         relationtoothers = NumberRelated(sample, usedists[sample])
         clusterjanei = relationtoothers["somewhat"] > 0
 
-        FinalizeSampleReport(sample, metainfodic[sample], pimpedresdic, clusterjanei, lin, species, speciesmash, relationtoothers, covdic[sample])
+        FinalizeSampleReport(sample, metainfodic[sample], pimpedresdic, clusterjanei, lin, species, speciesmash, relationtoothers, covdic[sample], samplesindb)
 
         # Finally, copy data that goes to global directory/reports
         CopyForEasyGlobalDirMove(sample)
