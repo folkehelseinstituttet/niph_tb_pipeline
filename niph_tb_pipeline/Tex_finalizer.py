@@ -31,22 +31,21 @@ def CreateInfo(metainfo, covdicsample):
                 RD = 0.0
     else:
         RD = 0.0
-
+    DataQualList = []
     if RD < 30.0:
-        DataQual = "Lav dybde"
-    elif os.path.isfile("Mashclassificationproblem"):
-        DataQual = "Ikke MTB"
-    elif os.path.isfile("Mashothermycobacterium"):
-        DataQual = "Annen mykobakterie"
-    #elif os.path.isfile("Kaijucontaminationproblem"):
-    #    DataQual = "Mulig kontaminasjon"
-    #elif covdicsample < 90.00:
-    elif percentage_aligned < 90.00:
-        DataQual = "Lav ref. coverage"
-    elif os.path.isfile("Fastqc_problems"):
-        DataQual = "Lav kvalitet"
-    else:
+        DataQualList.append("Lav dybde")
+    if os.path.isfile("Mashclassificationproblem"):
+        DataQualList.append("Ikke Mycobacterium")
+    if os.path.isfile("Mashothermycobacterium"):
+        DataQualList.append("Ikke MTB")
+    if percentage_aligned < 90.00:
+        DataQualList.append("Lav ref. coverage")
+    if os.path.isfile("Fastqc_problems"):
+        DataQualList.append("Lav kvalitet")
+    if len(DataQualList == 0):
         DataQual = "OK"
+    else:
+        DataQual = ", ".join(DataQualList)
 
     ID = metainfo["ID"].replace("_","\\_")
     Barcode = metainfo["Barcode"]
