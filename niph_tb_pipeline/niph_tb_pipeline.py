@@ -661,7 +661,7 @@ def GetSpeciesMykrobe(mykrobetsvfile):
         header = next(data)
         speciescol = header.index('species')
         binomial_name = re.sub("_"," ", next(data)[speciescol])
-        if binomial_name == "Mycobacterium_bovis":
+        if binomial_name == "Mycobacterium bovis":
             lineagecol = header.index('lineage')
             binomial_name = re.sub("_", " ", next(data)[lineagecol])
         return binomial_name
