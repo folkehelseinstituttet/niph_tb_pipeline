@@ -111,6 +111,8 @@ def CreateTyping(lineage):
     mix = EvaluateLineageMix(lineage)
     if lineage == "":
         typing = 'Pr\\o ven ble ikke entydig typet til en bestemt lineage. '
+    elif lineage == "4.9" and (os.path.isfile("Mashothermycobacterium") or os.path.isfile("Mashclassificationproblem")):
+        typing = 'Pr\\o ven hadde ingen fylogenetiske mutasjoner mot Hr37Rv, indikerer 4.9 eller annen art'
     else:
         typing = 'Pr\\o ven ble funnet\ \\aa\ tilh\\o re lineage %s. ' % (lineage)
     if mix:
