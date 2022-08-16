@@ -14,11 +14,12 @@ def CreateFooter(metainfo):
     with open("Latex_template/include/footer.tex","w") as outfile:
         outfile.write(footer)
 
-def CreateInfo(metainfo, covdicsample):
+def CreateInfo(metainfo, covdicsample, samplesindb):
     # DataQual should be assessed from presence of Fastqc / kaiju problem files
     num_variants = covdicsample["VARIANT"]
     bases_lowcov = covdicsample["LOWCOV"]
     bases_het = covdicsample["HET"]
+    samples_in_db = str(samplesindb)
     percentage_aligned = covdicsample["ALIGNED"] / (covdicsample["LENGTH"] - covdicsample["MASKED"]) * 100
     percentage_lowqual = covdicsample["LOWCOV"] / (covdicsample["LENGTH"] - covdicsample["MASKED"])
 
@@ -58,7 +59,7 @@ def CreateInfo(metainfo, covdicsample):
     infostring = '''
     ID for pr\\o ve    &  {SampleName}    & Perc. aligned          & {percentage_aligned:.2f}           \\\ \hline
     Variants   & {num_variants}         & Bases low cov       & {bases_lowcov}          \\\ \hline
-    Datakvalitet & {DataQual}       & Bases het & {bases_het}      \\\ \hline
+    Datakvalitet & {DataQual}       & Samples in DB & {samples_in_db}      \\\ \hline
     Read depth  & {Readdepth:.2f}       & Dato  & {currentdate}  \\\ \hline
     '''
 
@@ -68,7 +69,7 @@ def CreateInfo(metainfo, covdicsample):
         num_variants = num_variants,
         bases_lowcov = bases_lowcov,
         DataQual = DataQual,
-        bases_het = bases_het,
+        samples_in_db = samples_in_db,
         Readdepth = RD,
         currentdate = time.strftime("%Y-%b-%d"))
     with open("Latex_template/include/info.tex","w") as outfile:
@@ -370,9 +371,9 @@ Pipeline & {pipeline} & Referansegenom & {ref} \\\ \hline
     with open("Latex_template/include/pipelinedetaljer.tex","w") as outfile:
         outfile.write(text)
 
-def CreateReport(metainfo, resdic, clusterjanei, lineage, species, speciesmash, relationtoothers, covdicsample):
+def CreateReport(metainfo, resdic, clusterjanei, lineage, species, speciesmash, relationtoothers, covdicsample, samplesindb):
     CreateFooter(metainfo)
-    CreateInfo(metainfo, covdicsample)
+    CreateInfo(metainfo, covdicsample, samplesindb)
     CreateOppsummering(resdic, clusterjanei, species, speciesmash)
     CreateTyping(lineage)
     CreateResistensBokser(resdic)
