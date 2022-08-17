@@ -296,7 +296,9 @@ def RunSnippy(R1, R2):
     if os.path.isdir("snippy"):
         print("Snippy results already exits in %s" % os.getcwd(), flush=True)
         return 0
+    errorcode0 = call("source activate snippy",shell=TRUE)
     errorcode = call("snippy --outdir ./snippy --ref %s --R1 %s --R2 %s" % (TB_REF, R1, R2), shell=True) # REMOVED --cleanup (Needed for samtools depth - Remove BAM files later in script)
+    errorcode1 = call("conda deactivate", shell=TRUE)
 
 def FindCoverage():
     print("Checking coverage", flush=True)
@@ -480,8 +482,10 @@ def RunSnippyCore(basedir, timestamp):
 
     if not os.path.isfile("snippy-core.log"):
         try:
+            errorcode0 = call("source activate snippy",shell=TRUE)
             #errorcode1 = call("snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa --mask=/mnt/Reference/Trimal_excludecolumns.bed %s %s 2> snippy-core.log" % (timestamp, globaldirstxt, dirs), shell=True)
             errorcode1 = call("snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa %s %s 2> snippy-core.log" % (timestamp, globaldirstxt, dirs), shell=True)
+            errorcode2 = call("conda deactivate",shell=TRUE)
         except:
             #print("Command failed: snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa --mask=/mnt/Reference/Trimal_excludecolumns.bed %s %s 2> snippy-core.log" % (timestamp, globaldirstxt, dirs))
             print("Command failed: snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa %s %s 2> snippy-core.log" % (timestamp, globaldirstxt, dirs), flush=True)
