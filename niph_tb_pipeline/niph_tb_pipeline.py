@@ -169,9 +169,7 @@ def RunFastQC(R1, R2):
     
     # Run FastQC
     print("Running cmd: fastqc %s %s in dir %s" % (R1, R2, os.getcwd()), flush=True)
-    #errorcode = call("source activate fastqc", shell=True)
     errorcode = call("fastqc --extract %s %s" % (R1, R2), shell=True)
-    #errorcode = call("conda deactivate", shell=True)
     if errorcode != 0:
         sys.exit("FastQC did not complete correctly.")
 
@@ -296,9 +294,9 @@ def RunSnippy(R1, R2):
     if os.path.isdir("snippy"):
         print("Snippy results already exits in %s" % os.getcwd(), flush=True)
         return 0
-    errorcode0 = call("source activate snippy",shell=True)
+    os.system("source activate snippy")
     errorcode = call("snippy --outdir ./snippy --ref %s --R1 %s --R2 %s" % (TB_REF, R1, R2), shell=True) # REMOVED --cleanup (Needed for samtools depth - Remove BAM files later in script)
-    errorcode1 = call("conda deactivate", shell=True)
+    os.system("conda deactivate")
 
 def FindCoverage():
     print("Checking coverage", flush=True)
@@ -333,9 +331,9 @@ def RunMykrobe(R1, R2, sampleName):
         print("Mykrobe predictor results already exists in %s" % os.getcwd(), flush=True)
         return 0
     #errorcode1 = call("mykrobe predict %s tb --mccortex31_path %s -1 %s %s > mykrobe_output.json" % (sampleName, MCCORTEX31_PATH, R1, R2), shell=True)
-    errorcode0 = call("source activate mykrobe", shell=True)
+    os.system("source activate mykrobe")
     errorcode1 = call("mykrobe predict -s %s -S tb --output mykrobe_output.csv --format csv --min_proportion_expected_depth 0.15 -1 %s %s" % (sampleName, R1, R2), shell=True)
-    errorcode2 = call("conda deactivate", shell=True)
+    os.system("conda deactivate")
     #errorcode2 = call("json_to_tsv mykrobe_output.json > mykrobe_output.tsv", shell=True)
     #errorcode3 = call("rm -rf atlas", shell=True)
     errorcode4 = call("rm -rf mykrobe", shell=True)
