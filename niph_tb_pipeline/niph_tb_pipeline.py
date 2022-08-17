@@ -332,7 +332,7 @@ def RunMykrobe(R1, R2, sampleName):
         return 0
     #errorcode1 = call("mykrobe predict %s tb --mccortex31_path %s -1 %s %s > mykrobe_output.json" % (sampleName, MCCORTEX31_PATH, R1, R2), shell=True)
     errorcode0 = call("source activate mykrobe", shell=True)
-    errorcode1 = call("mykrobe predict %s tb --output mykrobe_output.csv --format csv --min_proportion_expected_depth 0.15 -1 %s %s" % (sampleName, R1, R2), shell=True)
+    errorcode1 = call("mykrobe predict -s %s -S tb --output mykrobe_output.csv --format csv --min_proportion_expected_depth 0.15 -1 %s %s" % (sampleName, R1, R2), shell=True)
     errorcode2 = call("conda deactivate", shell=True)
     #errorcode2 = call("json_to_tsv mykrobe_output.json > mykrobe_output.tsv", shell=True)
     #errorcode3 = call("rm -rf atlas", shell=True)
