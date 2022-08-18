@@ -481,10 +481,11 @@ def RunSnippyCore(basedir, timestamp):
 
     if not os.path.isfile("snippy-core.log"):
         try:
-            errorcode0 = call("source activate snippy",shell=True)
+            errorcode = call(["/bin/bash", "-c", "source activate snippy && snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa --mask=/mnt/Reference/Trimal_excludecolumns.bed %s %s 2> snippy-core.log && conda deactivate" % (timestamp, globaldirstxt, dirs)])
+            #errorcode0 = call("source activate snippy",shell=True)
             #errorcode1 = call("snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa --mask=/mnt/Reference/Trimal_excludecolumns.bed %s %s 2> snippy-core.log" % (timestamp, globaldirstxt, dirs), shell=True)
-            errorcode1 = call("snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa %s %s 2> snippy-core.log" % (timestamp, globaldirstxt, dirs), shell=True)
-            errorcode2 = call("conda deactivate",shell=True)
+            #errorcode1 = call("snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa %s %s 2> snippy-core.log" % (timestamp, globaldirstxt, dirs), shell=True)
+            #errorcode2 = call("conda deactivate",shell=True)
         except:
             #print("Command failed: snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa --mask=/mnt/Reference/Trimal_excludecolumns.bed %s %s 2> snippy-core.log" % (timestamp, globaldirstxt, dirs))
             print("Command failed: snippy-core --prefix=TB_all_%s --ref=/mnt/Reference/ref.fa %s %s 2> snippy-core.log" % (timestamp, globaldirstxt, dirs), flush=True)
