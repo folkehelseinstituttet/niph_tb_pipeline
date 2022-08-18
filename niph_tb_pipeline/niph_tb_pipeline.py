@@ -304,7 +304,7 @@ def FindCoverage():
         print("Average depth already calculated", flush=True)
         return 0
     #errorcode = call("gzip -cd snippy/snps.depth.gz | awk '{sum+=$3; sumsq+=$3*$3} END { print sum/NR; print sqrt(sumsq/NR - (sum/NR)**2)}' > averagedepth.txt", shell=True)
-    errorcode1 = call("samtools depth -aa snippy/snps.bam > snippy/snps.depth", shell=True)
+    errorcode1 = call(["/bin/bash", "-c", "source activate snippy && samtools depth -aa snippy/snps.bam > snippy/snps.depth && conda deactivate"])
     #errorcode = call("gzip -cd snippy/snps.depth.gz | awk '{sum+=$3} END { print sum/NR}' > averagedepth.txt", shell=True)
     errorcode2 = call("cat snippy/snps.depth | awk '{sum+=$3} END { print sum/NR}' > averagedepth.txt", shell=True)
 
