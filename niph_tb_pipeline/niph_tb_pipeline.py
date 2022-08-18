@@ -253,7 +253,8 @@ def ReadMashTopHit(mashreport):
     with open(mashreport,"rU") as mf:
         data = csv.reader(mf, delimiter="\t")
         tophit = next(data)
-        topmatch = CaptureMashHit(tophit[5])
+        runnerup = next(data)
+        topmatch = CaptureMashHit(tophit[5], runnerup[5])
 
     return topmatch
 
@@ -282,10 +283,12 @@ def AnalyzeMashTopHit(myfile):
         # ELSE: Do not write any files. Top species is MTB. Runner-up info not used (No contamination screen)
 
 
-def CaptureMashHit(string):
+def CaptureMashHit(tophit,runnerup):
     '''Method for capturing a binomial name from MASH screen results.'''
     pattern = "[A-Z][a-z]* [a-z]*( strain)?( BCG)?(-1)?( subsp\. \w+)?( phiX174)?"
-    match = re.search(pattern,string)[0]
+    match = re.search(pattern,tophit)[0]
+    if match == "Enterobacteria phage phiX174":
+        match = re.search(pattern,runnerup)
     return match
 
 
