@@ -43,7 +43,7 @@ def CreateInfo(metainfo, covdicsample, samplesindb):
         DataQualList.append("Lav ref. coverage")
     if os.path.isfile("Fastqc_problems"):
         DataQualList.append("Lav kvalitet")
-    if len(DataQualList == 0):
+    if len(DataQualList) == 0:
         DataQual = "OK"
     else:
         DataQual = ", ".join(DataQualList)
