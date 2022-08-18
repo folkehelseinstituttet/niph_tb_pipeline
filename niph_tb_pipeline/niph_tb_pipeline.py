@@ -288,7 +288,7 @@ def CaptureMashHit(tophit,runnerup):
     pattern = "[A-Z][a-z]* [a-z]*( strain)?( BCG)?(-1)?( subsp\. \w+)?( phiX174)?"
     match = re.search(pattern,tophit)[0]
     if match == "Enterobacteria phage phiX174":
-        match = re.search(pattern,runnerup)
+        match = re.search(pattern,runnerup)[0]
     return match
 
 
