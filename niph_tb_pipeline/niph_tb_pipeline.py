@@ -671,9 +671,10 @@ def GetSpeciesMykrobe(mykrobetsvfile):
         if binomial_name == "Mycobacterium bovis":
             lineagecol = header.index('lineage')
             binomial_name_2 = re.sub("_", " ", next(data)[lineagecol])
-            # Return lineage column only if Bovis BCG (Regular bovis will have unknown here)
-            if binomial_name_2 == "Mycobacterium bovis subsp bcg":
-                binomial_name = binomial_name_2
+            if "BCG" in binomial_name_2:
+                binomial_name = "Mycobacterium bovis subcp bcg"
+            else:
+                binomial_name = "Mycobacterium bovis (non-BCG)"
         return binomial_name
 
 def GetLineageColl(colltyperfile):
