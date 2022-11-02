@@ -45,8 +45,9 @@ WORKDIR /
 RUN pip install "setuptools<58.0.0"
 RUN pip install --upgrade git+https://github.com/admiralenola/colltyper
 
+# INSTALL PYTHON COMPONENT OF PIPELINE
 WORKDIR /opt/niph_tb_pipeline
-COPY niph_tb_pipeline .
+COPY . .
 RUN pip install --upgrade .
 WORKDIR /
 
