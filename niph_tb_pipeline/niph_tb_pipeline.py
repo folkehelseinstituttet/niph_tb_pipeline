@@ -351,9 +351,10 @@ def CollType():
     if os.path.isfile("colltype.txt"):
         print("Coll type already calculated", flush=True)
         return 0
-    #errorcode = call("colltyper -o colltype.txt snippy/snps.vcf", shell=True)
     # USE unfiltered VCF file to find mixed infections
-    errorcode = call("colltyper -o colltype.txt snippy/snps.raw.vcf", shell=True)
+    # NOTE: Requires NORMALIZATION first - SNPs can't be of length > 1 and still be detected by colltyper
+    errorcode1 = call(["/bin/bash", "-c", "source activate snippy && vt normalize -r %s -o snippy/snps.normalized.vcf snippy/snps.raw.vcf && conda deactivate" % (TB_ref)]
+    errorcode2 = call("colltyper -o colltype.txt snippy/snps.normalized.vcf", shell=True)
 
 def sampleAnalysis(sample):
     
